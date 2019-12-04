@@ -5,6 +5,9 @@
  */
 package my.finalproject;
 
+import java.sql.ResultSet;
+import java.util.Arrays;
+
 /**
  *
  * @author jpats
@@ -35,6 +38,7 @@ public class LogInUI extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         loginButton = new javax.swing.JButton();
         newUserButton = new javax.swing.JButton();
+        inputStatusLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -71,6 +75,11 @@ public class LogInUI extends javax.swing.JFrame {
         jLabel2.setText("Password:");
 
         loginButton.setText("Login");
+        loginButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loginButtonActionPerformed(evt);
+            }
+        });
 
         newUserButton.setText("New User");
         newUserButton.addActionListener(new java.awt.event.ActionListener() {
@@ -79,28 +88,31 @@ public class LogInUI extends javax.swing.JFrame {
             }
         });
 
+        inputStatusLabel.setForeground(new java.awt.Color(200, 0, 0));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(41, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(39, 39, 39)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(inputStatusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jLabel4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(newUserButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(loginButton))
-                    .addComponent(password, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(username, javax.swing.GroupLayout.Alignment.LEADING))
-                .addContainerGap(74, Short.MAX_VALUE))
+                    .addComponent(password)
+                    .addComponent(username))
+                .addGap(74, 74, 74))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -125,8 +137,12 @@ public class LogInUI extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(loginButton)
                     .addComponent(newUserButton))
-                .addContainerGap(112, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(inputStatusLabel)
+                .addContainerGap(105, Short.MAX_VALUE))
         );
+
+        inputStatusLabel.getAccessibleContext().setAccessibleDescription("");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -144,6 +160,30 @@ public class LogInUI extends javax.swing.JFrame {
         newUser.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_newUserButtonActionPerformed
+
+    private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
+        // SELECT password FROM user_pass WHERE user = username.getText()
+        String passwordInput = new String(password.getPassword());
+        String passwordDB = "";
+//        if (connection != null) {
+//            String sqlSelectPassword = "SELECT password FROM user_pass WHERE username=?";
+//            PreparedStatement stmt = connection.prepareStatement(sqlSelectPassword);
+//            stmt.setString(1, username.getText());
+    //        ResultSet rs = stmt.executeQuery();
+    //        if (rs.next()) {
+    //            passwordDB = rs.getString("password");
+    //        }
+//        }
+
+        if (passwordInput.equals(passwordDB)) {
+            SearchPageUI searchPage = new SearchPageUI();
+            searchPage.setVisible(true);
+            this.setVisible(false);
+        } else {
+            inputStatusLabel.setText("Invalid username and password");
+        }
+                        
+    }//GEN-LAST:event_loginButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -181,6 +221,7 @@ public class LogInUI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel inputStatusLabel;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
