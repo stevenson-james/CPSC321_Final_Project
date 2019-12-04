@@ -45,6 +45,7 @@ public class ProductPageUI extends javax.swing.JFrame {
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
+        jList1 = new javax.swing.JList<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -101,6 +102,17 @@ public class ProductPageUI extends javax.swing.JFrame {
         jLabel11.setText("Recommended Game 2");
 
         jLabel12.setText("RELATED GAMES");
+
+        jList1.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 1", "Tag 2", "Tag 3", "Tag 4" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        jList1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jList1.setFocusable(false);
+        jList1.setSelectionBackground(new java.awt.Color(255, 255, 255));
+        jList1.setSelectionForeground(new java.awt.Color(0, 0, 0));
+        jScrollPane1.setViewportView(jList1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -261,6 +273,7 @@ public class ProductPageUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JList<String> jList1;
     private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JScrollPane jScrollPane1;
