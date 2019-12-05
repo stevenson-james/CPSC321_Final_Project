@@ -5,19 +5,53 @@
  */
 package my.finalproject;
 
+import java.io.FileInputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Properties;
 
 /**
  *
  * @author jpats
  */
 public class LogInUI extends javax.swing.JFrame {
-
+    
+    Connection connection;
     /**
      * Creates new form LogInUI
      */
     public LogInUI() {
+        try {
+	    // connection info
+	    Properties prop = new Properties();
+	    FileInputStream in = new FileInputStream("config.properties");
+	    prop.load(in);
+	    in.close();
+	    
+	    // connect to datbase
+	    String hst = prop.getProperty("host");
+	    String usr = prop.getProperty("user");
+	    String pwd = prop.getProperty("password");
+	    String dab = "cpsc321_groupD_DB";
+	    String url = "jdbc:mysql://" + hst + "/" + dab;
+	    connection = DriverManager.getConnection(url, usr, pwd);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        
+        initComponents();
+    }
+    
+    public LogInUI(Connection connection) {
+        this.connection = connection;
+        
+        
+        
         initComponents();
         this.setLocationRelativeTo(null);
     }
@@ -158,24 +192,30 @@ public class LogInUI extends javax.swing.JFrame {
     }//GEN-LAST:event_usernameActionPerformed
 
     private void newUserButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newUserButtonActionPerformed
-        NewUserUI newUser = new NewUserUI();
+        NewUserUI newUser = new NewUserUI(connection);
         newUser.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_newUserButtonActionPerformed
 
     private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
-        // SELECT password FROM user_pass WHERE user = username.getText()
         String passwordInput = new String(password.getPassword());
         String passwordDB = "";
-//        if (connection != null) {
-//            String sqlSelectPassword = "SELECT password FROM user_pass WHERE username=?";
-//            PreparedStatement stmt = connection.prepareStatement(sqlSelectPassword);
-//            stmt.setString(1, username.getText());
-    //        ResultSet rs = stmt.executeQuery();
-    //        if (rs.next()) {
-    //            passwordDB = rs.getString("password");
-    //        }
-//        }
+        if (connection != null) {
+            String sqlSelectPassword = "SELECT * FROM player WHERE username=?";
+            try {
+                PreparedStatement stmt = connection.prepareStatement(sqlSelectPassword);
+                stmt.setString(1, username.getText());
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    passwordDB = rs.getString("player_pass");
+                } else {
+                    inputStatusLabel.setText("Account does not exist");
+                    return;
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
 
         if (passwordInput.equals(passwordDB)) {
             SearchPageUI searchPage = new SearchPageUI();
