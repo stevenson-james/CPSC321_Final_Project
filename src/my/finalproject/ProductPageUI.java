@@ -5,7 +5,14 @@
  */
 package my.finalproject;
 
+import java.io.FileInputStream;
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.util.Properties;
 
 /**
  *
@@ -23,8 +30,36 @@ public class ProductPageUI extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
         
         this.connection = connection;
-        
+        this.gameId = gameId;
 
+        loadInfo();
+    }
+
+    public ProductPageUI(int gameId) {
+        initComponents();
+        this.setLocationRelativeTo(null);
+        
+        try {
+	    // connection info
+	    Properties prop = new Properties();
+	    FileInputStream in = new FileInputStream("config.properties");
+	    prop.load(in);
+	    in.close();
+	    
+	    // connect to datbase
+	    String hst = prop.getProperty("host");
+	    String usr = prop.getProperty("user");
+	    String pwd = prop.getProperty("password");
+	    String dab = "cpsc321_groupD_DB";
+	    String url = "jdbc:mysql://" + hst + "/" + dab;
+	    connection = DriverManager.getConnection(url, usr, pwd);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        this.gameId = gameId;
+
+        loadInfo();
     }
     
     public ProductPageUI() {
@@ -276,7 +311,7 @@ public class ProductPageUI extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new ProductPageUI().setVisible(true);
+                new ProductPageUI(100).setVisible(true);
             }
         });
     }
@@ -303,4 +338,61 @@ public class ProductPageUI extends javax.swing.JFrame {
     private javax.swing.JButton submitButton;
     private javax.swing.JList<String> tagList;
     // End of variables declaration//GEN-END:variables
+
+    private void loadInfo() {
+        if (connection != null) {
+            try {
+                String sqlSelect1 = "SELECT * FROM game WHERE game_id=?";
+                String sqlSelect2 = "SELECT COUNT(*) FROM rating WHERE game_id=? AND score = 0";
+                String sqlSelect3 = "SELECT COUNT(*) FROM rating WHERE game_id=?";
+                int downvotes = 0;
+                int upvotes = 0;
+                double averageRating = 0;
+                
+                PreparedStatement stmt = connection.prepareStatement(sqlSelect1);
+                stmt.setString(1, Integer.toString(gameId));
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    DecimalFormat df = new DecimalFormat("0.00");
+                    jLabel1.setText(rs.getString("title"));
+                    releaseDateLabel.setText(rs.getString("release_date"));
+                    esrbLabel.setText(rs.getString("esrb"));
+                    priceLabel.setText("$" + df.format(rs.getDouble("price")));
+                    
+                } else {
+                    jLabel1.setText("Could not find game");
+                    return;
+                }
+                rs.close();
+                
+                PreparedStatement stmt2 = connection.prepareStatement(sqlSelect2);
+                stmt2.setString(1, Integer.toString(gameId));
+                ResultSet rs2 = stmt2.executeQuery();
+                if (rs2.next()) {
+                    downvotes = rs2.getInt("COUNT(*)");
+                    
+                }
+                rs2.close();
+                
+                PreparedStatement stmt3 = connection.prepareStatement(sqlSelect3);
+                stmt3.setString(1, Integer.toString(gameId));
+                ResultSet rs3 = stmt3.executeQuery();
+                if (rs3.next()) {
+                    int totalRatings = rs3.getInt("COUNT(*)");
+                    upvotes = totalRatings - downvotes;
+                    averageRating = (double) upvotes / totalRatings * 100;
+                    System.out.println("down: " + downvotes + ", total: " + totalRatings);
+                    
+                }
+                rs3.close();
+                averageRatingLabel.setText(averageRating + "% of people recommend");
+                numberRecommendLabel.setText(upvotes + " people recommend");
+                numberNotRecommendLabel.setText(downvotes + " people do not recommend");
+                
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
 }
