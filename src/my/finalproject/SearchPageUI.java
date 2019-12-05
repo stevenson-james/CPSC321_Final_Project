@@ -30,35 +30,15 @@ public class SearchPageUI extends javax.swing.JFrame {
     /**
      * Creates new form SearchPageUI
      */
-    public SearchPageUI() {
-        initComponents();
-        this.setLocationRelativeTo(null);
-    }
-    
     public SearchPageUI(Connection connection, String playerId) {
+        this.connection = connection;
+        this.playerId = playerId;
+        
         initComponents();
         this.setLocationRelativeTo(null);
-        this.connection = connection;
-        DefaultListModel listModel = new DefaultListModel();
-        
-        if (connection != null) {
-            try {
-                String sqlSelectTags = "SELECT DISTINCT genre_name FROM tag";
-                Statement stmt = connection.createStatement();
-                ResultSet rs = stmt.executeQuery(sqlSelectTags);
-                while(rs.next())
-                    listModel.addElement(rs.getString("genre_name"));
-                tagList.setModel(listModel);
-                rs.close();
-                
-            }
-            catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        this.playerId = playerId;
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
+        setTagModel();
     }
 
     
@@ -226,17 +206,103 @@ public class SearchPageUI extends javax.swing.JFrame {
     }//GEN-LAST:event_titleSearchBarActionPerformed
 
     private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonActionPerformed
-
-
         if (!checkTextFields()) {
             return;
         }
         
+        Map<String, String> params = new HashMap<>();
+        String sqlSelect = generatePreparedStatement(params);
+        String minRating = jTextField1.getText();
         
+        executeSearch(sqlSelect, minRating, params);
+    }//GEN-LAST:event_searchButtonActionPerformed
+
+    private void maxPriceTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_maxPriceTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_maxPriceTextFieldActionPerformed
+
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField1ActionPerformed
+
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel errorLabel;
+    private javax.swing.JComboBox<String> esrbPicker;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField maxPriceTextField;
+    private javax.swing.JTextField minPriceTextField;
+    private javax.swing.JButton searchButton;
+    private javax.swing.JList<String> tagList;
+    private javax.swing.JTextField titleSearchBar;
+    private javax.swing.JLabel welcomeLabel;
+    // End of variables declaration//GEN-END:variables
+
+    private boolean checkTextFields() {
+        String rating = jTextField1.getText();
+        String minPrice = minPriceTextField.getText();
+        String maxPrice = maxPriceTextField.getText();
+        
+        try {
+            if (!rating.equals("")) {
+                if (Double.parseDouble(rating) > 100) {
+                    errorLabel.setText("Ratings must be between 0 and 100");
+                    return false;
+                }
+            }
+            
+            if (!minPrice.equals("")) {
+                Double.parseDouble(minPrice);
+            }
+            if (!maxPrice.equals("")) {
+                Double.parseDouble(maxPrice);
+            }
+
+            if (!minPrice.equals("") && !maxPrice.equals("")) {
+                return Double.parseDouble(minPrice) < Double.parseDouble(maxPrice);
+            }
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            errorLabel.setText("Enter numeric values for rating and price range");
+            return false;
+        }
+    }
+
+    private void setTagModel() {
+        DefaultListModel listModel = new DefaultListModel();
+        
+        if (connection != null) {
+            try {
+                String sqlSelectTags = "SELECT DISTINCT genre_name FROM tag";
+                Statement stmt = connection.createStatement();
+                ResultSet rs = stmt.executeQuery(sqlSelectTags);
+                while(rs.next())
+                    listModel.addElement(rs.getString("genre_name"));
+                tagList.setModel(listModel);
+                rs.close();
+                
+            }
+            catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    private String generatePreparedStatement(Map<String, String> params) {
         String sqlSelect = "SELECT g.title FROM game g LEFT JOIN rating r USING "
                 + "(game_id) LEFT JOIN tag t USING (game_id)";
         
-        Map<String, String> params = new HashMap<>();
+        
         if (!titleSearchBar.getText().equals("")) {
             params.put("g.title = ?", titleSearchBar.getText());
         }
@@ -285,131 +351,14 @@ public class SearchPageUI extends javax.swing.JFrame {
         if (!jTextField1.getText().equals("")) {
             sqlSelect += " HAVING AVG(r.score) * 100 > ?";
         }
-                
         
-        if (connection != null) {
-            try {
-                System.out.println("Search Page Connection");
-                PreparedStatement stmt = connection.prepareStatement(sqlSelect);
-                
-                int setCt = 1;
-                for (String paramKey : params.keySet()) {
-                    stmt.setString(setCt, params.get(paramKey));
-                    setCt++;
-                }
-                if (!minRating.equals("")) {
-                    stmt.setString(setCt, minRating);
-                }
-                
-                System.out.println(stmt.toString());
-                ResultSet rs = stmt.executeQuery();                
-                SearchResultsUI results = new SearchResultsUI(connection, rs, sqlSelect, params, minRating, playerId);
-                this.setVisible(false);
-                results.setVisible(true);
-                rs.close();
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        
-
-        
-
-    }//GEN-LAST:event_searchButtonActionPerformed
-
-    private void maxPriceTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_maxPriceTextFieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_maxPriceTextFieldActionPerformed
-
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(SearchPageUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(SearchPageUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(SearchPageUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(SearchPageUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new SearchPageUI().setVisible(true);
-            }
-        });
+        return sqlSelect;
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel errorLabel;
-    private javax.swing.JComboBox<String> esrbPicker;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField maxPriceTextField;
-    private javax.swing.JTextField minPriceTextField;
-    private javax.swing.JButton searchButton;
-    private javax.swing.JList<String> tagList;
-    private javax.swing.JTextField titleSearchBar;
-    private javax.swing.JLabel welcomeLabel;
-    // End of variables declaration//GEN-END:variables
+    private void executeSearch(String sqlSelect, String minRating, Map<String, String> params) {           
+        SearchResultsUI results = new SearchResultsUI(connection, sqlSelect, params, minRating, playerId);
+        this.setVisible(false);
+        results.setVisible(true);
 
-    private boolean checkTextFields() {
-        String rating = jTextField1.getText();
-        String minPrice = minPriceTextField.getText();
-        String maxPrice = maxPriceTextField.getText();
-        
-        try {
-            if (!rating.equals("")) {
-                if (Double.parseDouble(rating) > 100) {
-                    errorLabel.setText("Ratings must be between 0 and 100");
-                    return false;
-                }
-            }
-            
-            if (!minPrice.equals("")) {
-                Double.parseDouble(minPrice);
-            }
-            if (!maxPrice.equals("")) {
-                Double.parseDouble(maxPrice);
-            }
-            
-
-            if (!minPrice.equals("") && !maxPrice.equals("")) {
-                return Double.parseDouble(minPrice) < Double.parseDouble(maxPrice);
-            }
-
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            errorLabel.setText("Enter numeric values for rating and price range");
-            return false;
-        }
     }
 }

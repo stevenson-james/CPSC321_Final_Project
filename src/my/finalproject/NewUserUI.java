@@ -23,20 +23,14 @@ public class NewUserUI extends javax.swing.JFrame {
     /**
      * Creates new form NewUserUI
      */
-    public NewUserUI() {
-        initComponents();
-        this.setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    }
-
     public NewUserUI(Connection connection) {
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
         this.connection = connection;
         
         initComponents();
         this.setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -172,40 +166,15 @@ public class NewUserUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void createButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createButtonActionPerformed
-        if (password1.getPassword().length < 4) {
-            jLabel1.setText("Password must be at least 4 characters long");
+        if (!checkPasswordLength()) {
             return;
         }
         
-        if (!Arrays.equals(password1.getPassword(), password2.getPassword())) {
-            jLabel1.setText("Passwords do not match");
+        if (!checkPasswordMatch()) {
             return;
         }
         
-        if (connection != null) {
-            try {
-                String sqlSelectUsername = "SELECT * FROM player WHERE username=?";
-                PreparedStatement stmt = connection.prepareStatement(sqlSelectUsername);
-                stmt.setString(1, username.getText());
-                ResultSet rs = stmt.executeQuery();
-                if (rs.next()) {
-                    jLabel1.setText("Username is already taken, choose a different one");
-                } else {
-                    String userDB = username.getText();
-                    String passDB = new String(password1.getPassword());
-                    String sqlInsert = "INSERT INTO player (username, player_pass) VALUES (?, ?)";
-                    PreparedStatement stmt1 = connection.prepareStatement(sqlInsert);
-                    stmt1.setString(1, userDB);
-                    stmt1.setString(2, passDB);
-                    stmt1.execute();
-                    LogInUI logIn = new LogInUI(connection);
-                    logIn.setVisible(true);
-                    this.setVisible(false);
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+        attemptInsert();
     }//GEN-LAST:event_createButtonActionPerformed
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
@@ -226,41 +195,6 @@ public class NewUserUI extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_password2ActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(NewUserUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(NewUserUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(NewUserUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(NewUserUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new NewUserUI().setVisible(true);
-            }
-        });
-    }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
     private javax.swing.JButton createButton;
@@ -273,4 +207,51 @@ public class NewUserUI extends javax.swing.JFrame {
     private javax.swing.JLabel title;
     private javax.swing.JTextField username;
     // End of variables declaration//GEN-END:variables
+
+    private boolean checkPasswordLength() {
+        if (password1.getPassword().length < 4) {
+            jLabel1.setText("Password must be at least 4 characters long");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkPasswordMatch() {
+        if (!Arrays.equals(password1.getPassword(), password2.getPassword())) {
+            jLabel1.setText("Passwords do not match");
+            return false;
+        }
+        return true;
+    }
+
+    private void attemptInsert() {
+        String usernameStr = username.getText();
+        String passwordStr = new String(password1.getPassword());
+            
+            
+        if (connection != null) {
+            try {
+                String sqlSelectUsername = "SELECT * FROM player WHERE username = ?";
+                PreparedStatement stmt = connection.prepareStatement(sqlSelectUsername);
+                stmt.setString(1, usernameStr);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    jLabel1.setText("Username is already taken, choose a different one");
+                    rs.close();
+                } else {
+                    String sqlInsert = "INSERT INTO player (username, player_pass) VALUES (?, ?)";
+                    PreparedStatement stmt1 = connection.prepareStatement(sqlInsert);
+                    stmt1.setString(1, usernameStr);
+                    stmt1.setString(2, passwordStr);
+                    stmt1.execute();
+                    
+                    LogInUI logIn = new LogInUI(connection);
+                    logIn.setVisible(true);
+                    this.setVisible(false);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

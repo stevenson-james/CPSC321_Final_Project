@@ -25,41 +25,42 @@ public class SearchResultsUI extends javax.swing.JFrame {
     String sqlSelect;
     Map<String, String> params;
     String rating;
+    
     /**
      * Creates new form SearchResultsUI
      */
-    public SearchResultsUI() {
-        initComponents();
-        this.setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    }
-    
     public SearchResultsUI(Connection connection, ResultSet rs, String sqlSelect, Map<String, String> params, String rating, String playerId) {
-        initComponents();
         this.connection = connection;
         this.rsTitles = rs;
         this.sqlSelect = sqlSelect;
         this.params = params;
         this.rating = rating;
-        int resultNumber = 0;
-        DefaultListModel listModel = new DefaultListModel();
-        
-        try {
-            while(rsTitles.next()) {
-                listModel.addElement(rsTitles.getString("g.title"));
-                resultNumber++;
-            }
-            gameCountLabel.setText(Integer.toString(resultNumber) + " games found");
-            resultsList.setModel(listModel);
-            rsTitles.close();
-        }catch (SQLException e) {
-                e.printStackTrace();
-        }
-        
-        this.setLocationRelativeTo(null);
         this.playerId = playerId;
+        int resultNumber = 0;
+        
+        initComponents();
+        this.setLocationRelativeTo(null);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        sortByComboBox.setSelectedIndex(0);
     }
 
+    
+    public SearchResultsUI(Connection connection, String sqlSelect, Map<String, String> params, String rating, String playerId) {
+        this.connection = connection;
+        this.sqlSelect = sqlSelect;
+        this.params = params;
+        this.rating = rating;
+        this.playerId = playerId;
+        int resultNumber = 0;
+        
+        initComponents();
+        this.setLocationRelativeTo(null);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        sortByComboBox.setSelectedIndex(0);
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -174,64 +175,9 @@ public class SearchResultsUI extends javax.swing.JFrame {
 
     private void sortByComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sortByComboBoxActionPerformed
         JComboBox<String> order = (JComboBox<String>) evt.getSource();
-        String orderAddition = "";
-        switch (order.getSelectedIndex()) {
-            case 0:
-                orderAddition += " ORDER BY g.title ASC";
-                break;
-            case 1:
-                orderAddition += " ORDER BY g.title DESC";
-                break;
-            case 2:
-                orderAddition += " ORDER BY g.release_date ASC";
-                break;
-            case 3:
-                orderAddition += " ORDER BY g.release_date DESC";
-                break;
-            case 4:
-                orderAddition += " ORDER BY AVG(r.score) ASC";
-                break;
-            case 5:
-                orderAddition += " ORDER BY AVG(r.score) DESC";
-                break;
-            case 6: 
-                orderAddition += " ORDER BY g.price ASC";
-                break;
-            case 7:
-                orderAddition += " ORDER BY g.price DESC";
-                break;
-        }
+        String orderAddition = getOrderByString(order.getSelectedIndex());
         
-        if (connection != null) {
-            try {
-                PreparedStatement stmt = connection.prepareStatement(sqlSelect + orderAddition);
-                
-                int setCt = 1;
-                for (String paramKey : params.keySet()) {
-                    stmt.setString(setCt, params.get(paramKey));
-                    setCt++;
-                }
-                if (!rating.equals("")) {
-                    stmt.setString(setCt, rating);
-                }
-                
-                System.out.println(stmt.toString());
-                ResultSet rs = stmt.executeQuery();  
-                
-                DefaultListModel listModel = new DefaultListModel();
-                int resultNumber = 0;
-                while(rs.next()) {
-                    listModel.addElement(rs.getString("g.title"));
-                    resultNumber++;
-                }
-                gameCountLabel.setText(Integer.toString(resultNumber) + " games found");
-                resultsList.setModel(listModel);
-                rs.close();
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+        refreshList(orderAddition);
     }//GEN-LAST:event_sortByComboBoxActionPerformed
 
     private void goToGameButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_goToGameButtonActionPerformed
@@ -263,40 +209,6 @@ public class SearchResultsUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_goToGameButtonActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(SearchResultsUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(SearchResultsUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(SearchResultsUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(SearchResultsUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new SearchResultsUI().setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel error;
@@ -309,4 +221,68 @@ public class SearchResultsUI extends javax.swing.JFrame {
     private javax.swing.JList<String> resultsList;
     private javax.swing.JComboBox<String> sortByComboBox;
     // End of variables declaration//GEN-END:variables
+
+    private String getOrderByString(int selectedIndex) {
+        String orderAddition = "";
+        switch (selectedIndex) {
+            case 0:
+                orderAddition += " ORDER BY g.title ASC";
+                break;
+            case 1:
+                orderAddition += " ORDER BY g.title DESC";
+                break;
+            case 2:
+                orderAddition += " ORDER BY g.release_date ASC";
+                break;
+            case 3:
+                orderAddition += " ORDER BY g.release_date DESC";
+                break;
+            case 4:
+                orderAddition += " ORDER BY AVG(r.score) ASC";
+                break;
+            case 5:
+                orderAddition += " ORDER BY AVG(r.score) DESC";
+                break;
+            case 6: 
+                orderAddition += " ORDER BY g.price ASC";
+                break;
+            case 7:
+                orderAddition += " ORDER BY g.price DESC";
+                break;
+        }
+        
+        return orderAddition;
+    }
+
+    private void refreshList(String orderAddition) {
+        if (connection != null) {
+            try {
+                PreparedStatement stmt = connection.prepareStatement(sqlSelect + orderAddition);
+                
+                int setCt = 1;
+                for (String paramKey : params.keySet()) {
+                    stmt.setString(setCt, params.get(paramKey));
+                    setCt++;
+                }
+                if (!rating.equals("")) {
+                    stmt.setString(setCt, rating);
+                }
+                
+                ResultSet rs = stmt.executeQuery();  
+                
+                DefaultListModel listModel = new DefaultListModel();
+                int resultNumber = 0;
+                while(rs.next()) {
+                    listModel.addElement(rs.getString("g.title"));
+                    resultNumber++;
+                }
+                gameCountLabel.setText(Integer.toString(resultNumber) + " games found");
+                resultsList.setModel(listModel);
+                rs.close();
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
