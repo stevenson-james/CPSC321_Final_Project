@@ -49,6 +49,8 @@ public class SearchPageUI extends javax.swing.JFrame {
                 while(rs.next())
                     listModel.addElement(rs.getString("genre_name"));
                 tagList.setModel(listModel);
+                rs.close();
+                
             }
             catch (SQLException e) {
                 e.printStackTrace();
