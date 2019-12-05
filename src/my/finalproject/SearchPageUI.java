@@ -17,7 +17,7 @@ import java.text.DecimalFormat;
  */
 public class SearchPageUI extends javax.swing.JFrame {
     Connection connection;
-    
+    String playerId;
     
     /**
      * Creates new form SearchPageUI
@@ -27,11 +27,11 @@ public class SearchPageUI extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
     }
     
-    public SearchPageUI(Connection connection) {
+    public SearchPageUI(Connection connection, String playerId) {
         initComponents();
         this.setLocationRelativeTo(null);
         this.connection = connection;
-        
+        this.playerId = playerId;
     }
 
     
@@ -201,7 +201,7 @@ public class SearchPageUI extends javax.swing.JFrame {
     }//GEN-LAST:event_titleSearchBarActionPerformed
 
     private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonActionPerformed
-        SearchResultsUI searchResults = new SearchResultsUI(connection);
+        SearchResultsUI searchResults = new SearchResultsUI(connection, playerId);
         searchResults.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_searchButtonActionPerformed

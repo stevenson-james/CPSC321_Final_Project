@@ -16,6 +16,7 @@ import java.sql.SQLException;
  */
 public class SearchResultsUI extends javax.swing.JFrame {
     Connection connection;
+    String playerId;
     /**
      * Creates new form SearchResultsUI
      */
@@ -24,10 +25,11 @@ public class SearchResultsUI extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
     }
     
-    public SearchResultsUI(Connection connection) {
+    public SearchResultsUI(Connection connection, String playerId) {
         initComponents();
         this.connection = connection;
         this.setLocationRelativeTo(null);
+        this.playerId = playerId;
     }
 
     /**
@@ -168,7 +170,7 @@ public class SearchResultsUI extends javax.swing.JFrame {
                 catch (SQLException e) {
                     e.printStackTrace();
                 }
-            ProductPageUI productPage = new ProductPageUI(gameId);
+            ProductPageUI productPage = new ProductPageUI(gameId, playerId);
             productPage.setVisible(true);
             this.setVisible(false);
             }
