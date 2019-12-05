@@ -102,6 +102,7 @@ public class SearchResultsUI extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel2.setText("Sort By");
 
+        resultsList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane1.setViewportView(resultsList);
 
         goToGameButton.setText("Go to Game");

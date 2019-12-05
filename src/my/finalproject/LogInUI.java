@@ -28,31 +28,13 @@ public class LogInUI extends javax.swing.JFrame {
      */
     public LogInUI() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
-        try {
-	    // connection info
-	    Properties prop = new Properties();
-	    FileInputStream in = new FileInputStream("config.properties");
-	    prop.load(in);
-	    in.close();
-	    
-	    // connect to datbase
-	    String hst = prop.getProperty("host");
-	    String usr = prop.getProperty("user");
-	    String pwd = prop.getProperty("password");
-	    String dab = "cpsc321_groupD_DB";
-	    String url = "jdbc:mysql://" + hst + "/" + dab;
-	    connection = DriverManager.getConnection(url, usr, pwd);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         initComponents();
+        connection = getConnection();
         this.setLocationRelativeTo(null);
     }
     
     public LogInUI(Connection connection) {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
         this.connection = connection;
         initComponents();
         this.setLocationRelativeTo(null);
@@ -236,11 +218,32 @@ public class LogInUI extends javax.swing.JFrame {
                 e.printStackTrace();
             }
         } else {
-            inputStatusLabel.setText("Invalid username and password");
+            inputStatusLabel.setText("Invalid password");
         }
                         
     }//GEN-LAST:event_loginButtonActionPerformed
 
+    public Connection getConnection(){
+        try {
+	    // connection info
+	    Properties prop = new Properties();
+	    FileInputStream in = new FileInputStream("config.properties");
+	    prop.load(in);
+	    in.close();
+	    
+	    // connect to datbase
+	    String hst = prop.getProperty("host");
+	    String usr = prop.getProperty("user");
+	    String pwd = prop.getProperty("password");
+	    String dab = "cpsc321_groupD_DB";
+	    String url = "jdbc:mysql://" + hst + "/" + dab;
+	    return DriverManager.getConnection(url, usr, pwd);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -275,6 +278,7 @@ public class LogInUI extends javax.swing.JFrame {
             }
         });
     }
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel inputStatusLabel;
