@@ -5,10 +5,12 @@
  */
 package my.finalproject;
 
+import javax.swing.JFrame;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.swing.DefaultListModel;
 
 /**
  *
@@ -17,17 +19,39 @@ import java.sql.SQLException;
 public class SearchResultsUI extends javax.swing.JFrame {
     Connection connection;
     String playerId;
+    ResultSet rsTitles;
     /**
      * Creates new form SearchResultsUI
      */
     public SearchResultsUI() {
         initComponents();
         this.setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
     
-    public SearchResultsUI(Connection connection, String playerId) {
+
+    public SearchResultsUI(Connection connection, ResultSet rs, String playerId) {
+
+    //public SearchResultsUI(Connection connection, ResultSet rs) {
+
         initComponents();
         this.connection = connection;
+        this.rsTitles = rs;
+        int resultNumber = 0;
+        DefaultListModel listModel = new DefaultListModel();
+        
+        try {
+            while(rsTitles.next()) {
+                listModel.addElement(rsTitles.getString("g.title"));
+                resultNumber++;
+            }
+            gameCountLabel.setText(Integer.toString(resultNumber) + " games found");
+            resultsList.setModel(listModel);
+            rsTitles.close();
+        }catch (SQLException e) {
+                e.printStackTrace();
+        }
+        
         this.setLocationRelativeTo(null);
         this.playerId = playerId;
     }
@@ -49,6 +73,7 @@ public class SearchResultsUI extends javax.swing.JFrame {
         resultsList = new javax.swing.JList<>();
         goToGameButton = new javax.swing.JButton();
         error = new javax.swing.JLabel();
+        gameCountLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -73,11 +98,6 @@ public class SearchResultsUI extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel2.setText("Sort By");
 
-        resultsList.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Counter-Strike: Global Offensive", "Game 2", "Game 3", "Game 1", "Game 2", "Game 3", "Game 1", "Game 2", "Game 3", "Game 1", "Game 2", "Game 3", "Game 1", "Game 2", "Game 3", "Game 1", "Game 2", "Game 3", "Game 1", "Game 2", "Game 3", "Game 1", "Game 2", "Game 3" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
         jScrollPane1.setViewportView(resultsList);
 
         goToGameButton.setText("Go to Game");
@@ -107,7 +127,8 @@ public class SearchResultsUI extends javax.swing.JFrame {
                                 .addComponent(jLabel2))
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                 .addComponent(error, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(sortByComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addComponent(sortByComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(gameCountLabel)))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(homeButton)
                         .addGap(40, 40, 40)
@@ -127,7 +148,9 @@ public class SearchResultsUI extends javax.swing.JFrame {
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(sortByComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(54, 54, 54)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(gameCountLabel)
+                        .addGap(42, 42, 42)
                         .addComponent(error)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(goToGameButton, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -139,7 +162,7 @@ public class SearchResultsUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void homeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_homeButtonActionPerformed
-        SearchPageUI searchPage = new SearchPageUI();
+        SearchPageUI searchPage = new SearchPageUI(connection, playerId);
         searchPage.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_homeButtonActionPerformed
@@ -214,6 +237,7 @@ public class SearchResultsUI extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel error;
+    private javax.swing.JLabel gameCountLabel;
     private javax.swing.JButton goToGameButton;
     private javax.swing.JButton homeButton;
     private javax.swing.JLabel jLabel1;
