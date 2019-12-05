@@ -105,7 +105,7 @@ public class ProductPageUI extends javax.swing.JFrame {
         jLabel12 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tagList = new javax.swing.JList<>();
-        jLabel2 = new javax.swing.JLabel();
+        submittedLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -176,8 +176,6 @@ public class ProductPageUI extends javax.swing.JFrame {
         tagList.setSelectionForeground(new java.awt.Color(0, 0, 0));
         jScrollPane1.setViewportView(tagList);
 
-        jLabel2.setText("");
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -215,21 +213,20 @@ public class ProductPageUI extends javax.swing.JFrame {
                                         .addComponent(numberNotRecommendLabel)
                                         .addGap(0, 0, 0)
                                         .addComponent(jLabel6)))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(notRecommendRadioButton)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(notRecommendRadioButton)
+                                .addGap(81, 81, 81)
+                                .addComponent(submittedLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(homeButton)
                                 .addGap(42, 42, 42)
                                 .addComponent(jLabel1)))
                         .addGap(0, 0, Short.MAX_VALUE))))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(59, 59, 59)
-                .addComponent(jLabel2)
-                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -270,11 +267,14 @@ public class ProductPageUI extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(recommendRadioButton)
                     .addComponent(submitButton, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(notRecommendRadioButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel2))
+                .addGap(4, 4, 4)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(notRecommendRadioButton)
+                    .addComponent(submittedLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(14, Short.MAX_VALUE))
         );
+
+        submittedLabel.getAccessibleContext().setAccessibleName("");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -295,31 +295,27 @@ public class ProductPageUI extends javax.swing.JFrame {
             notRecommendIsChecked = true;
         }
         else {
-            jLabel2.setText("No button was selected");
+            submittedLabel.setText("No button was selected");
         }
         try
         {
             if (recommendIsChecked) {
-                //Statement stmt = connection.createStatement();
-                //String q = "SELECT * FROM rating ";
-                //ResultSet rs = stmt.executeQuery(q);
-                
                 String query = "INSERT INTO rating(player_id, game_id, score) VALUES (?,?,?)";
                 PreparedStatement stmt = connection.prepareStatement(query);
-                stmt.setString(1, this.playerId);   // NEEDS TO PASS PLAYER_ID *********************************
+                stmt.setString(1, this.playerId);
                 stmt.setString(2, this.gameId);
                 stmt.setInt(3, 1);
                 stmt.execute();
-                jLabel2.setText("Query was executed successfully.");
+                submittedLabel.setText("Review saved");
             }
             if (notRecommendIsChecked) {
                 String query = "INSERT INTO rating(player_id, game_id, score) VALUES (?,?,?)";
                 PreparedStatement stmt = connection.prepareStatement(query);
-                stmt.setString(1, this.playerId);   // NEEDS TO PASS PLAYER_ID *********************************
+                stmt.setString(1, this.playerId);
                 stmt.setString(2, this.gameId);
                 stmt.setInt(3, 0);
                 stmt.execute();
-                jLabel2.setText("Query was executed successfully.");
+                submittedLabel.setText("Review saved");
             }
         }
         catch(Exception e) {
@@ -378,7 +374,6 @@ public class ProductPageUI extends javax.swing.JFrame {
     private javax.swing.JButton homeButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
@@ -393,6 +388,7 @@ public class ProductPageUI extends javax.swing.JFrame {
     private javax.swing.JRadioButton recommendRadioButton;
     private javax.swing.JLabel releaseDateLabel;
     private javax.swing.JButton submitButton;
+    private javax.swing.JLabel submittedLabel;
     private javax.swing.JList<String> tagList;
     // End of variables declaration//GEN-END:variables
 
