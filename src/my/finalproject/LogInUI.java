@@ -214,7 +214,7 @@ public class LogInUI extends javax.swing.JFrame {
         }
 
         if (passwordInput.equals(passwordDB)) {
-            SearchPageUI searchPage = new SearchPageUI();
+            SearchPageUI searchPage = new SearchPageUI(connection);
             searchPage.setVisible(true);
             this.setVisible(false);
         } else {

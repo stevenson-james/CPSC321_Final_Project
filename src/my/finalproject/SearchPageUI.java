@@ -6,6 +6,10 @@
 package my.finalproject;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.DecimalFormat;
 
 /**
  *
@@ -197,7 +201,7 @@ public class SearchPageUI extends javax.swing.JFrame {
     }//GEN-LAST:event_titleSearchBarActionPerformed
 
     private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonActionPerformed
-        SearchResultsUI searchResults = new SearchResultsUI();
+        SearchResultsUI searchResults = new SearchResultsUI(connection);
         searchResults.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_searchButtonActionPerformed
