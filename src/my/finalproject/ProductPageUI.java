@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.Properties;
+import javax.swing.JFrame;
 
 /**
  *
@@ -21,6 +22,7 @@ import java.util.Properties;
 public class ProductPageUI extends javax.swing.JFrame {
     int gameId;
     Connection connection;
+    boolean rating;
 
     /**
      * Creates new form ProductPageUI
@@ -28,9 +30,13 @@ public class ProductPageUI extends javax.swing.JFrame {
     public ProductPageUI(Connection connection, int gameId) {
         initComponents();
         this.setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         this.connection = connection;
         this.gameId = gameId;
+        
+        submitButton.setEnabled(false);
+        
 
         loadInfo();
     }
@@ -264,7 +270,8 @@ public class ProductPageUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void recommendRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_recommendRadioButtonActionPerformed
-        // TODO add your handling code here:
+        
+        submitButton.setEnabled(true);
     }//GEN-LAST:event_recommendRadioButtonActionPerformed
 
     private void submitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_submitButtonActionPerformed
@@ -272,7 +279,7 @@ public class ProductPageUI extends javax.swing.JFrame {
     }//GEN-LAST:event_submitButtonActionPerformed
 
     private void notRecommendRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_notRecommendRadioButtonActionPerformed
-        // TODO add your handling code here:
+        submitButton.setEnabled(true);
     }//GEN-LAST:event_notRecommendRadioButtonActionPerformed
 
     private void homeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_homeButtonActionPerformed

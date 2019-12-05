@@ -5,6 +5,8 @@
  */
 package my.finalproject;
 
+import javax.swing.JFrame;
+
 /**
  *
  * @author jpats
@@ -17,6 +19,7 @@ public class SearchResultsUI extends javax.swing.JFrame {
     public SearchResultsUI() {
         initComponents();
         this.setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     /**

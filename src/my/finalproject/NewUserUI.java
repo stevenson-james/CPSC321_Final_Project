@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import javax.swing.JFrame;
 
 /**
  *
@@ -25,9 +26,12 @@ public class NewUserUI extends javax.swing.JFrame {
     public NewUserUI() {
         initComponents();
         this.setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     public NewUserUI(Connection connection) {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
         this.connection = connection;
         
         initComponents();

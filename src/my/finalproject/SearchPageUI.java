@@ -6,6 +6,12 @@
 package my.finalproject;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.JFrame;
 
 /**
  *
@@ -27,6 +33,8 @@ public class SearchPageUI extends javax.swing.JFrame {
         initComponents();
         this.setLocationRelativeTo(null);
         this.connection = connection;
+        
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
     }
 
@@ -55,7 +63,7 @@ public class SearchPageUI extends javax.swing.JFrame {
         jTextField1 = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
+        tagList = new javax.swing.JList<String>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -87,7 +95,6 @@ public class SearchPageUI extends javax.swing.JFrame {
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel4.setText("Rating   >");
 
-
         jLabel5.setText("Price");
 
         minPriceTextField.setText("lower price");
@@ -111,12 +118,12 @@ public class SearchPageUI extends javax.swing.JFrame {
 
         jLabel1.setText("%");
 
-        jList1.setModel(new javax.swing.AbstractListModel<String>() {
+        tagList.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 5", "Multiplayer", "Free-to-Play", "Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 5", "Multiplayer", "Free-to-Play" };
             public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
+            public Object getElementAt(int i) { return strings[i]; }
         });
-        jScrollPane1.setViewportView(jList1);
+        jScrollPane1.setViewportView(tagList);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -138,16 +145,15 @@ public class SearchPageUI extends javax.swing.JFrame {
                                 .addComponent(jLabel6)
                                 .addGap(18, 18, 18)
                                 .addComponent(maxPriceTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel2)
-                                .addComponent(jLabel5)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(jLabel4)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jLabel1))
-                                .addComponent(esrbPicker, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel5)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel4)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel1))
+                            .addComponent(esrbPicker, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(18, 18, 18)
@@ -197,9 +203,80 @@ public class SearchPageUI extends javax.swing.JFrame {
     }//GEN-LAST:event_titleSearchBarActionPerformed
 
     private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonActionPerformed
-        SearchResultsUI searchResults = new SearchResultsUI();
-        searchResults.setVisible(true);
-        this.setVisible(false);
+        if (!checkTextFields()) {
+            return;
+        }
+        
+        
+        String sqlSelect = "SELECT g.game_id FROM game g JOIN rating r USING "
+                + "(game_id) JOIN tag t USING (game_id)";
+        
+        Map<String, String> params = new HashMap<>();
+        if (!titleSearchBar.getText().equals("")) {
+            params.put("g.title = ?", titleSearchBar.getText());
+        }
+        
+        if (esrbPicker.getSelectedIndex() != 0) {
+            params.put("g.esrb = ?", esrbPicker.getSelectedItem().toString());
+        }
+        
+        int tagCt = 0;
+        for (String tagString : tagList.getSelectedValuesList()) {
+            params.put("t.tag = ?", tagString);
+            tagCt++;
+        }
+        
+        if (!minPriceTextField.getText().equals("")) {
+            params.put("g.price >= ?", minPriceTextField.getText());
+        }
+        
+        if (!maxPriceTextField.getText().equals("")) {
+            params.put("g.price <= ?", maxPriceTextField.getText());
+        }
+        
+        int pCt = 0;
+        for (String paramKey : params.keySet()) {
+            if (pCt == 0) {
+                sqlSelect += " WHERE " + paramKey;
+                pCt++;
+            } else {
+                sqlSelect += " AND " + paramKey;
+                pCt++;
+            }
+        }
+        
+        sqlSelect += " GROUP BY game_id";
+        
+        String minRating = jTextField1.getText();
+        if (!jTextField1.getText().equals("")) {
+            sqlSelect += " HAVING AVG(r.rating) > ?";
+        }
+        
+        System.out.println(sqlSelect);
+        
+        
+        if (connection != null) {
+            try {
+                PreparedStatement stmt = connection.prepareStatement(sqlSelect);
+                
+                int setCt = 1;
+                for (String paramKey : params.keySet()) {
+                    stmt.setString(setCt, params.get(paramKey));
+                    setCt++;
+                }
+                if (!minRating.equals("")) {
+                    stmt.setString(setCt, minRating);
+                }
+                
+                System.out.println(stmt.toString());
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        
+
+        
     }//GEN-LAST:event_searchButtonActionPerformed
 
     private void maxPriceTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_maxPriceTextFieldActionPerformed
@@ -253,13 +330,31 @@ public class SearchPageUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JList<String> jList1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField maxPriceTextField;
     private javax.swing.JTextField minPriceTextField;
     private javax.swing.JButton searchButton;
+    private javax.swing.JList<String> tagList;
     private javax.swing.JTextField titleSearchBar;
     private javax.swing.JLabel welcomeLabel;
     // End of variables declaration//GEN-END:variables
+
+    private boolean checkTextFields() {
+        try {
+            Double.parseDouble(jTextField1.getText());
+            Double.parseDouble(minPriceTextField.getText());
+            Double.parseDouble(maxPriceTextField.getText());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        
+        if (Double.parseDouble(jTextField1.getText()) > 100) {
+            return false;
+        }
+        
+        return Double.parseDouble(minPriceTextField.getText()) < Double.parseDouble(maxPriceTextField.getText());
+
+    }
 }
