@@ -5,18 +5,31 @@
  */
 package my.finalproject;
 
+import java.sql.Connection;
+
 /**
  *
  * @author jpats
  */
 public class ProductPageUI extends javax.swing.JFrame {
+    int gameId;
+    Connection connection;
 
     /**
      * Creates new form ProductPageUI
      */
-    public ProductPageUI() {
+    public ProductPageUI(Connection connection, int gameId) {
         initComponents();
         this.setLocationRelativeTo(null);
+        
+        this.connection = connection;
+        
+
+    }
+    
+    public ProductPageUI() {
+        initComponents();
+        this.setLocationRelativeTo(null);     
 
     }
 
@@ -228,7 +241,7 @@ public class ProductPageUI extends javax.swing.JFrame {
     }//GEN-LAST:event_notRecommendRadioButtonActionPerformed
 
     private void homeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_homeButtonActionPerformed
-        SearchPageUI searchPage = new SearchPageUI();
+        SearchPageUI searchPage = new SearchPageUI(connection);
         searchPage.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_homeButtonActionPerformed

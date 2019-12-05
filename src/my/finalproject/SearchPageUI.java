@@ -5,12 +5,16 @@
  */
 package my.finalproject;
 
+import java.sql.Connection;
+
 /**
  *
  * @author jpats
  */
 public class SearchPageUI extends javax.swing.JFrame {
-
+    Connection connection;
+    
+    
     /**
      * Creates new form SearchPageUI
      */
@@ -18,7 +22,16 @@ public class SearchPageUI extends javax.swing.JFrame {
         initComponents();
         this.setLocationRelativeTo(null);
     }
+    
+    public SearchPageUI(Connection connection) {
+        initComponents();
+        this.setLocationRelativeTo(null);
+        this.connection = connection;
+        
+    }
 
+    
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -31,12 +44,12 @@ public class SearchPageUI extends javax.swing.JFrame {
         welcomeLabel = new javax.swing.JLabel();
         titleSearchBar = new javax.swing.JTextField();
         searchButton = new javax.swing.JButton();
-        esrbPicker = new javax.swing.JComboBox<>();
+        esrbPicker = new javax.swing.JComboBox<String>();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        tagPicker = new javax.swing.JComboBox<>();
+        tagPicker = new javax.swing.JComboBox<String>();
         jLabel4 = new javax.swing.JLabel();
-        ratingPicker = new javax.swing.JComboBox<>();
+        ratingPicker = new javax.swing.JComboBox<String>();
         jLabel5 = new javax.swing.JLabel();
         minPriceTextField = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
@@ -61,20 +74,20 @@ public class SearchPageUI extends javax.swing.JFrame {
             }
         });
 
-        esrbPicker.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "E", "E10", "T", "M" }));
+        esrbPicker.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "E", "E10", "T", "M" }));
 
-        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel2.setText("ESRB");
 
-        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel3.setText("Tags");
 
-        tagPicker.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        tagPicker.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
-        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel4.setText("Rating");
 
-        ratingPicker.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "> 20%", "> 40%", "> 60%", "> 80%", "> 90%" }));
+        ratingPicker.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "> 20%", "> 40%", "> 60%", "> 80%", "> 90%" }));
         ratingPicker.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 ratingPickerActionPerformed(evt);
@@ -111,7 +124,7 @@ public class SearchPageUI extends javax.swing.JFrame {
                                 .addGap(31, 31, 31)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(ratingPicker, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addGap(29, 29, 29)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(tagPicker, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
