@@ -318,7 +318,7 @@ public class ProductPageUI extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new ProductPageUI("100").setVisible(true);
+                new ProductPageUI().setVisible(true);
             }
         });
     }

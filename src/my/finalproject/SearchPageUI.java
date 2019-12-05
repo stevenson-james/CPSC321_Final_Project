@@ -9,12 +9,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JFrame;
 
 import java.text.DecimalFormat;
+import javax.swing.DefaultListModel;
 
 
 /**
@@ -37,7 +39,21 @@ public class SearchPageUI extends javax.swing.JFrame {
         initComponents();
         this.setLocationRelativeTo(null);
         this.connection = connection;
+        DefaultListModel listModel = new DefaultListModel();
         
+        if (connection != null) {
+            try {
+                String sqlSelectTags = "SELECT DISTINCT genre_name FROM tag";
+                Statement stmt = connection.createStatement();
+                ResultSet rs = stmt.executeQuery(sqlSelectTags);
+                while(rs.next())
+                    listModel.addElement(rs.getString("genre_name"));
+                tagList.setModel(listModel);
+            }
+            catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
     }
