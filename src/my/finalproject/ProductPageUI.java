@@ -30,95 +30,16 @@ public class ProductPageUI extends javax.swing.JFrame {
     /**
      * Creates new form ProductPageUI
      */
-    public ProductPageUI(Connection connection, String gameId) {
+    public ProductPageUI(String gameId, String playerId, Connection connection) {
         initComponents();
         this.setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
+        this.playerId = playerId;
         this.connection = connection;
         this.gameId = gameId;
         
-        submitButton.setEnabled(false);
-        
-
-        loadInfo();
-    }
-
-    public ProductPageUI(String gameId, String playerId) {
-        initComponents();
-        this.setLocationRelativeTo(null);
-        this.playerId = playerId;
-        
-        try {
-	    // connection info
-	    Properties prop = new Properties();
-	    FileInputStream in = new FileInputStream("config.properties");
-	    prop.load(in);
-	    in.close();
-	    
-	    // connect to datbase
-	    String hst = prop.getProperty("host");
-	    String usr = prop.getProperty("user");
-	    String pwd = prop.getProperty("password");
-	    String dab = "cpsc321_groupD_DB";
-	    String url = "jdbc:mysql://" + hst + "/" + dab;
-	    connection = DriverManager.getConnection(url, usr, pwd);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        
-        DefaultListModel listModel = new DefaultListModel();
-        
-        if (connection != null) {
-            try {
-                String sqlSelectTags = "SELECT DISTINCT genre_name FROM tag WHERE game_id = ?";
-                PreparedStatement stmt = connection.prepareStatement(sqlSelectTags);
-                stmt.setString(1, gameId);
-                ResultSet rs = stmt.executeQuery();
-                while(rs.next())
-                    listModel.addElement(rs.getString("genre_name"));
-                tagList.setModel(listModel);
-                rs.close();
-            }
-            catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        
-        if (connection != null) {
-            try {
-                String sqlSelectRelated = "SELECT g.title FROM game g JOIN tag t USING (game_id) WHERE "
-                        + "g.game_id != ? AND t.genre_name IN (SELECT t1.genre_name FROM tag t1 WHERE "
-                        + "t1.game_id = ?) GROUP BY g.game_id ORDER BY COUNT(*) LIMIT 3";
-                PreparedStatement stmt1 = connection.prepareStatement(sqlSelectRelated);
-                stmt1.setString(1, gameId);
-                stmt1.setString(2, gameId);
-                ResultSet rs = stmt1.executeQuery();
-                
-                int i = 0;
-                while(rs.next()) {
-                    switch (i) {
-                        case 0:
-                            recommendGameLabel1.setText(rs.getString("g.title"));
-                            break;
-                        case 1:
-                            recommendGameLabel2.setText(rs.getString("g.title"));
-                            break;
-                        case 2:
-                            recommendedGameLabel3.setText(rs.getString("g.title"));
-                            break;
-                    }
-                    i++;
-                }
-                rs.close();
-            }
-            catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        
-        this.gameId = gameId;
-
+        setTags();
+        setRecommendedGames();
         loadInfo();
     }
     
@@ -156,7 +77,7 @@ public class ProductPageUI extends javax.swing.JFrame {
         recommendGameLabel2 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tagList = new javax.swing.JList<>();
+        tagList = new javax.swing.JList<String>();
         submittedLabel = new javax.swing.JLabel();
         publisherLabel = new javax.swing.JLabel();
         developerLabel = new javax.swing.JLabel();
@@ -219,10 +140,10 @@ public class ProductPageUI extends javax.swing.JFrame {
         jLabel12.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabel12.setText("RELATED GAMES");
 
-        tagList.setModel(new javax.swing.AbstractListModel<String>() {
+        tagList.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 1", "Tag 2", "Tag 3", "Tag 4" };
             public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
+            public Object getElementAt(int i) { return strings[i]; }
         });
         tagList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         tagList.setFocusable(false);
@@ -243,16 +164,15 @@ public class ProductPageUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(homeButton)
-                        .addGap(42, 42, 42)
-                        .addComponent(jLabel1)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
                         .addComponent(recommendRadioButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(submitButton, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(homeButton)
+                                .addGap(42, 42, 42)
+                                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(recommendGameLabel1)
@@ -270,7 +190,7 @@ public class ProductPageUI extends javax.swing.JFrame {
                                         .addComponent(numberNotRecommendLabel)
                                         .addGap(0, 0, 0)
                                         .addComponent(jLabel6)))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 101, Short.MAX_VALUE)
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(recommendGameLabel2)
@@ -279,15 +199,14 @@ public class ProductPageUI extends javax.swing.JFrame {
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(recommendedGameLabel3)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(developerLabel)))
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel9)
+                                .addComponent(developerLabel))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel9)
+                                .addGap(0, 0, Short.MAX_VALUE))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(notRecommendRadioButton)
                                 .addGap(81, 81, 81)
-                                .addComponent(submittedLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(submittedLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                         .addContainerGap())))
         );
         layout.setVerticalGroup(
@@ -324,7 +243,7 @@ public class ProductPageUI extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(publisherLabel)
                     .addComponent(recommendGameLabel2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 7, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(developerLabel)
                     .addComponent(recommendedGameLabel3))
@@ -347,19 +266,20 @@ public class ProductPageUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void recommendRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_recommendRadioButtonActionPerformed
-        
         submitButton.setEnabled(true);
     }//GEN-LAST:event_recommendRadioButtonActionPerformed
 
     private void submitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_submitButtonActionPerformed
-        // TODO add your handling code here:
         boolean recommendIsChecked = false;
         boolean notRecommendIsChecked = false;
+        int intPlayerId = Integer.parseInt(this.playerId);
         if(recommendRadioButton.isSelected()) {
             recommendIsChecked = true;
+            notRecommendIsChecked = false;
         }
         if (notRecommendRadioButton.isSelected()) {
             notRecommendIsChecked = true;
+            recommendIsChecked = false;
         }
         else {
             submittedLabel.setText("No button was selected");
@@ -367,27 +287,53 @@ public class ProductPageUI extends javax.swing.JFrame {
         try
         {
             if (recommendIsChecked) {
-                String query = "INSERT INTO rating(player_id, game_id, score) VALUES (?,?,?)";
-                PreparedStatement stmt = connection.prepareStatement(query);
-                stmt.setString(1, this.playerId);
-                stmt.setString(2, this.gameId);
-                stmt.setInt(3, 1);
-                stmt.execute();
-                submittedLabel.setText("Review saved");
+                
+                String q = "SELECT player_id FROM rating WHERE game_id = ? AND player_id = ?";
+                PreparedStatement stmt = connection.prepareStatement(q);
+                stmt.setString(1, this.gameId);
+                stmt.setString(2, this.playerId);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {   
+                    submittedLabel.setText("You already left a review.");
+                    
+                }
+                else{
+
+                    String query = "INSERT INTO rating(player_id, game_id, score) VALUES (?,?,?)";
+                    PreparedStatement stmt2 = connection.prepareStatement(query);
+                    stmt2.setString(1, this.playerId);
+                    stmt2.setString(2, this.gameId);
+                    stmt2.setInt(3, 1);
+                    stmt2.execute();
+                    submittedLabel.setText("Review saved");
+                }
+
             }
             if (notRecommendIsChecked) {
-                String query = "INSERT INTO rating(player_id, game_id, score) VALUES (?,?,?)";
-                PreparedStatement stmt = connection.prepareStatement(query);
-                stmt.setString(1, this.playerId);
-                stmt.setString(2, this.gameId);
-                stmt.setInt(3, 0);
-                stmt.execute();
-                submittedLabel.setText("Review saved");
+                String q = "SELECT player_id FROM rating WHERE game_id = ? AND player_id = ?";
+                PreparedStatement stmt = connection.prepareStatement(q);
+                stmt.setString(1, this.gameId);
+                stmt.setString(2, this.playerId);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {      
+                    submittedLabel.setText("You already left a review.");
+                }
+                else {
+
+                    String query = "INSERT INTO rating(player_id, game_id, score) VALUES (?,?,?)";
+                    PreparedStatement stmt2 = connection.prepareStatement(query);
+                    stmt2.setString(1, this.playerId);
+                    stmt2.setString(2, this.gameId);
+                    stmt2.setInt(3, 0);
+                    stmt2.execute();
+                    submittedLabel.setText("Review saved");
+                }
             }
         }
         catch(Exception e) {
             e.printStackTrace();
         }
+
     }//GEN-LAST:event_submitButtonActionPerformed
 
     private void notRecommendRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_notRecommendRadioButtonActionPerformed
@@ -400,68 +346,60 @@ public class ProductPageUI extends javax.swing.JFrame {
         this.setVisible(false);
     }//GEN-LAST:event_homeButtonActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
+    private void setTags(){
+        DefaultListModel listModel = new DefaultListModel();
+        
+        if (connection != null) {
+            try {
+                String sqlSelectTags = "SELECT DISTINCT genre_name FROM tag WHERE game_id = ?";
+                PreparedStatement stmt = connection.prepareStatement(sqlSelectTags);
+                stmt.setString(1, gameId);
+                ResultSet rs = stmt.executeQuery();
+                while(rs.next())
+                    listModel.addElement(rs.getString("genre_name"));
+                tagList.setModel(listModel);
+                rs.close();
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ProductPageUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ProductPageUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ProductPageUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ProductPageUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new ProductPageUI().setVisible(true);
-            }
-        });
     }
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel averageRatingLabel;
-    private javax.swing.JLabel developerLabel;
-    private javax.swing.JLabel esrbLabel;
-    private javax.swing.JButton homeButton;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel9;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JRadioButton notRecommendRadioButton;
-    private javax.swing.JLabel numberNotRecommendLabel;
-    private javax.swing.JLabel numberRecommendLabel;
-    private javax.swing.JLabel priceLabel;
-    private javax.swing.JLabel publisherLabel;
-    private javax.swing.ButtonGroup ratingButttonGroup;
-    private javax.swing.JLabel recommendGameLabel1;
-    private javax.swing.JLabel recommendGameLabel2;
-    private javax.swing.JRadioButton recommendRadioButton;
-    private javax.swing.JLabel recommendedGameLabel3;
-    private javax.swing.JLabel releaseDateLabel;
-    private javax.swing.JButton submitButton;
-    private javax.swing.JLabel submittedLabel;
-    private javax.swing.JList<String> tagList;
-    // End of variables declaration//GEN-END:variables
-
+    
+    private void setRecommendedGames(){
+        if (connection != null) {
+            try {
+                String sqlSelectRelated = "SELECT g.title FROM game g JOIN tag t USING (game_id) WHERE "
+                        + "g.game_id != ? AND t.genre_name IN (SELECT t1.genre_name FROM tag t1 WHERE "
+                        + "t1.game_id = ?) GROUP BY g.game_id ORDER BY COUNT(*) LIMIT 3";
+                PreparedStatement stmt1 = connection.prepareStatement(sqlSelectRelated);
+                stmt1.setString(1, gameId);
+                stmt1.setString(2, gameId);
+                ResultSet rs = stmt1.executeQuery();
+                
+                int i = 0;
+                while(rs.next()) {
+                    switch (i) {
+                        case 0:
+                            recommendGameLabel1.setText(rs.getString("g.title"));
+                            break;
+                        case 1:
+                            recommendGameLabel2.setText(rs.getString("g.title"));
+                            break;
+                        case 2:
+                            recommendedGameLabel3.setText(rs.getString("g.title"));
+                            break;
+                    }
+                    i++;
+                }
+                rs.close();
+            }
+            catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
     private void loadInfo() {
         if (connection != null) {
             try {
@@ -478,8 +416,10 @@ public class ProductPageUI extends javax.swing.JFrame {
                 if (rs.next()) {
                     DecimalFormat df = new DecimalFormat("0.00");
                     jLabel1.setText(rs.getString("title"));
-                    releaseDateLabel.setText(rs.getString("release_date"));
-                    esrbLabel.setText(rs.getString("esrb"));
+                    releaseDateLabel.setText("Release Date: " + rs.getString("release_date"));
+                    esrbLabel.setText("ESRB: " + rs.getString("esrb"));
+                    publisherLabel.setText(rs.getString("publisher"));
+                    developerLabel.setText(rs.getString("developer"));
                     priceLabel.setText("$" + df.format(rs.getDouble("price")));
                     
                 } else {
@@ -517,4 +457,64 @@ public class ProductPageUI extends javax.swing.JFrame {
 
         }
     }
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(ProductPageUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(ProductPageUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(ProductPageUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(ProductPageUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new ProductPageUI().setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel averageRatingLabel;
+    private javax.swing.JLabel developerLabel;
+    private javax.swing.JLabel esrbLabel;
+    private javax.swing.JButton homeButton;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JRadioButton notRecommendRadioButton;
+    private javax.swing.JLabel numberNotRecommendLabel;
+    private javax.swing.JLabel numberRecommendLabel;
+    private javax.swing.JLabel priceLabel;
+    private javax.swing.JLabel publisherLabel;
+    private javax.swing.ButtonGroup ratingButttonGroup;
+    private javax.swing.JLabel recommendGameLabel1;
+    private javax.swing.JLabel recommendGameLabel2;
+    private javax.swing.JRadioButton recommendRadioButton;
+    private javax.swing.JLabel recommendedGameLabel3;
+    private javax.swing.JLabel releaseDateLabel;
+    private javax.swing.JButton submitButton;
+    private javax.swing.JLabel submittedLabel;
+    private javax.swing.JList<String> tagList;
+    // End of variables declaration//GEN-END:variables
 }

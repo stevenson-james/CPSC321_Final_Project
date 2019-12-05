@@ -180,35 +180,6 @@ public class SearchResultsUI extends javax.swing.JFrame {
         refreshList(orderAddition);
     }//GEN-LAST:event_sortByComboBoxActionPerformed
 
-    private void goToGameButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_goToGameButtonActionPerformed
-        //modify list so only one selection allowed
-        if (resultsList.isSelectionEmpty())
-            error.setText("No game selected");
-        else {
-            String gameTitle = resultsList.getSelectedValue(); 
-            String gameId = "-1";
-            System.out.println("CLICK");
-            if (connection != null) {
-                System.out.println("CONNECTION");
-                try {
-                    String sqlSelectGameId = "SELECT game_id FROM game WHERE title=?";
-                    PreparedStatement stmt = connection.prepareStatement(sqlSelectGameId);
-                    stmt.setString(1, gameTitle);
-                    ResultSet rs = stmt.executeQuery();
-                    if (rs.next()) {
-                      gameId = rs.getString("game_id");
-                    }
-                }
-                catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            ProductPageUI productPage = new ProductPageUI(gameId, playerId);
-            productPage.setVisible(true);
-            this.setVisible(false);
-            }
-        }
-    }//GEN-LAST:event_goToGameButtonActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel error;
@@ -284,5 +255,33 @@ public class SearchResultsUI extends javax.swing.JFrame {
                 e.printStackTrace();
             }
         }
-    }
+    }                                              
+
+    private void goToGameButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_goToGameButtonActionPerformed
+        //modify list so only one selection allowed
+        if (resultsList.isSelectionEmpty())
+            error.setText("No game selected");
+        else {
+            String gameTitle = resultsList.getSelectedValue(); 
+            String gameId = "-1";
+            if (connection != null) {
+                try {
+                    String sqlSelectGameId = "SELECT game_id FROM game WHERE title=?";
+                    PreparedStatement stmt = connection.prepareStatement(sqlSelectGameId);
+                    stmt.setString(1, gameTitle);
+                    ResultSet rs = stmt.executeQuery();
+                    if (rs.next()) {
+                      gameId = rs.getString("game_id");
+                    }
+                }
+                catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            ProductPageUI productPage = new ProductPageUI(gameId, playerId, connection);
+            productPage.setVisible(true);
+            this.setVisible(false);
+            }
+        }
+    }//GEN-LAST:event_goToGameButtonActionPerformed
+
 }

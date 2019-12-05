@@ -183,47 +183,13 @@ public class LogInUI extends javax.swing.JFrame {
 
     private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
         String passwordInput = new String(password.getPassword());
-        String passwordDB = "";
-        if (connection != null) {
-            String sqlSelectPassword = "SELECT * FROM player WHERE username=?";
-            try {
-                PreparedStatement stmt = connection.prepareStatement(sqlSelectPassword);
-                stmt.setString(1, username.getText());
-                ResultSet rs = stmt.executeQuery();
-                if (rs.next()) {
-                    passwordDB = rs.getString("player_pass");
-                } else {
-                    inputStatusLabel.setText("Account does not exist");
-                    return;
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
-        if (passwordInput.equals(passwordDB)) {
-            try {
-                String q = "SELECT player_id FROM player WHERE username = ?";
-                PreparedStatement stmt = connection.prepareStatement(q);
-                stmt.setString(1, username.getText());
-                ResultSet rs = stmt.executeQuery();
-                if(rs.next()) {
-                    playerId = rs.getString("player_id");
-                } 
-                SearchPageUI searchPage = new SearchPageUI(connection, playerId);
-                searchPage.setVisible(true);
-                this.setVisible(false);
-            }   
-            catch(Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            inputStatusLabel.setText("Invalid password");
-        }
-                        
+        String passwordDB = checkUserName();
+        
+        if (!passwordDB.equals(""))
+            checkPassword(passwordInput, passwordDB);
     }//GEN-LAST:event_loginButtonActionPerformed
 
-    public Connection getConnection(){
+    private Connection getConnection(){
         try {
 	    // connection info
 	    Properties prop = new Properties();
@@ -242,6 +208,48 @@ public class LogInUI extends javax.swing.JFrame {
             e.printStackTrace();
             return null;
         }
+    }
+    
+    private String checkUserName(){
+        if (connection != null) {
+            String sqlSelectPassword = "SELECT * FROM player WHERE username=?";
+            try {
+                PreparedStatement stmt = connection.prepareStatement(sqlSelectPassword);
+                stmt.setString(1, username.getText());
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    return rs.getString("player_pass");
+                } else {
+                    inputStatusLabel.setText("Account does not exist");
+                    return "";
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return "";
+    }
+    
+    private void checkPassword(String passwordInput, String passwordDB){
+        if (passwordInput.equals(passwordDB)) {
+            try {
+                String q = "SELECT player_id FROM player WHERE username = ?";
+                PreparedStatement stmt = connection.prepareStatement(q);
+                stmt.setString(1, username.getText());
+                ResultSet rs = stmt.executeQuery();
+                if(rs.next()) {
+                    playerId = rs.getString("player_id");
+                } 
+                SearchPageUI searchPage = new SearchPageUI(connection, playerId);
+                searchPage.setVisible(true);
+                this.setVisible(false);
+            }   
+            catch(Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            inputStatusLabel.setText("Invalid password");
+        }   
     }
     
     /**

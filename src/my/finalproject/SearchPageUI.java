@@ -335,7 +335,6 @@ public class SearchPageUI extends javax.swing.JFrame {
                 }
                 pCt++;
             } else {
-                System.out.println(paramKey + ", t.genre_name");
                 if (paramKey.contains("tag")) {
                     sqlSelect += " OR t.genre_name = ?";
                 } else {
