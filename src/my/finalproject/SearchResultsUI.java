@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.swing.DefaultListModel;
 
 /**
  *
@@ -16,6 +17,7 @@ import java.sql.SQLException;
  */
 public class SearchResultsUI extends javax.swing.JFrame {
     Connection connection;
+    ResultSet rsTitles;
     /**
      * Creates new form SearchResultsUI
      */
@@ -24,9 +26,23 @@ public class SearchResultsUI extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
     }
     
-    public SearchResultsUI(Connection connection) {
+    public SearchResultsUI(Connection connection, ResultSet rs) {
         initComponents();
         this.connection = connection;
+        this.rsTitles = rs;
+        int resultNumber = 0;
+        DefaultListModel listModel = new DefaultListModel();
+        
+        try {
+            while(rsTitles.next()) {
+                listModel.addElement(rsTitles.getString("g.title"));
+                resultNumber++;
+            }
+            resultsList.setModel(listModel);
+        }catch (SQLException e) {
+                e.printStackTrace();
+        }
+        
         this.setLocationRelativeTo(null);
     }
 
@@ -71,11 +87,6 @@ public class SearchResultsUI extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel2.setText("Sort By");
 
-        resultsList.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Counter-Strike: Global Offensive", "Game 2", "Game 3", "Game 1", "Game 2", "Game 3", "Game 1", "Game 2", "Game 3", "Game 1", "Game 2", "Game 3", "Game 1", "Game 2", "Game 3", "Game 1", "Game 2", "Game 3", "Game 1", "Game 2", "Game 3", "Game 1", "Game 2", "Game 3" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
         jScrollPane1.setViewportView(resultsList);
 
         goToGameButton.setText("Go to Game");
