@@ -78,6 +78,39 @@ public class ProductPageUI extends javax.swing.JFrame {
                 while(rs.next())
                     listModel.addElement(rs.getString("genre_name"));
                 tagList.setModel(listModel);
+                rs.close();
+            }
+            catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        
+        if (connection != null) {
+            try {
+                String sqlSelectRelated = "SELECT g.title FROM game g JOIN tag t USING (game_id) WHERE "
+                        + "g.game_id != ? AND t.genre_name IN (SELECT t1.genre_name FROM tag t1 WHERE "
+                        + "t1.game_id = ?) GROUP BY g.game_id ORDER BY COUNT(*) LIMIT 3";
+                PreparedStatement stmt1 = connection.prepareStatement(sqlSelectRelated);
+                stmt1.setString(1, gameId);
+                stmt1.setString(2, gameId);
+                ResultSet rs = stmt1.executeQuery();
+                
+                int i = 0;
+                while(rs.next()) {
+                    switch (i) {
+                        case 0:
+                            recommendGameLabel1.setText(rs.getString("g.title"));
+                            break;
+                        case 1:
+                            recommendGameLabel2.setText(rs.getString("g.title"));
+                            break;
+                        case 2:
+                            recommendedGameLabel3.setText(rs.getString("g.title"));
+                            break;
+                    }
+                    i++;
+                }
+                rs.close();
             }
             catch (SQLException e) {
                 e.printStackTrace();
