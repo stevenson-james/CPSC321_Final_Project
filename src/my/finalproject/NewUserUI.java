@@ -24,6 +24,7 @@ public class NewUserUI extends javax.swing.JFrame {
      */
     public NewUserUI() {
         initComponents();
+        this.setLocationRelativeTo(null);
     }
 
     public NewUserUI(Connection connection) {
