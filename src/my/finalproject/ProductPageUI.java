@@ -20,14 +20,14 @@ import javax.swing.JFrame;
  * @author jpats
  */
 public class ProductPageUI extends javax.swing.JFrame {
-    int gameId;
+    String gameId;
     Connection connection;
     boolean rating;
 
     /**
      * Creates new form ProductPageUI
      */
-    public ProductPageUI(Connection connection, int gameId) {
+    public ProductPageUI(Connection connection, String gameId) {
         initComponents();
         this.setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -41,7 +41,7 @@ public class ProductPageUI extends javax.swing.JFrame {
         loadInfo();
     }
 
-    public ProductPageUI(int gameId) {
+    public ProductPageUI(String gameId) {
         initComponents();
         this.setLocationRelativeTo(null);
         
@@ -318,7 +318,7 @@ public class ProductPageUI extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new ProductPageUI(100).setVisible(true);
+                new ProductPageUI("100").setVisible(true);
             }
         });
     }
@@ -357,7 +357,7 @@ public class ProductPageUI extends javax.swing.JFrame {
                 double averageRating = 0;
                 
                 PreparedStatement stmt = connection.prepareStatement(sqlSelect1);
-                stmt.setString(1, Integer.toString(gameId));
+                stmt.setString(1, gameId);
                 ResultSet rs = stmt.executeQuery();
                 if (rs.next()) {
                     DecimalFormat df = new DecimalFormat("0.00");
@@ -373,7 +373,7 @@ public class ProductPageUI extends javax.swing.JFrame {
                 rs.close();
                 
                 PreparedStatement stmt2 = connection.prepareStatement(sqlSelect2);
-                stmt2.setString(1, Integer.toString(gameId));
+                stmt2.setString(1, gameId);
                 ResultSet rs2 = stmt2.executeQuery();
                 if (rs2.next()) {
                     downvotes = rs2.getInt("COUNT(*)");
@@ -382,17 +382,16 @@ public class ProductPageUI extends javax.swing.JFrame {
                 rs2.close();
                 
                 PreparedStatement stmt3 = connection.prepareStatement(sqlSelect3);
-                stmt3.setString(1, Integer.toString(gameId));
+                stmt3.setString(1, gameId);
                 ResultSet rs3 = stmt3.executeQuery();
                 if (rs3.next()) {
                     int totalRatings = rs3.getInt("COUNT(*)");
                     upvotes = totalRatings - downvotes;
                     averageRating = (double) upvotes / totalRatings * 100;
-                    System.out.println("down: " + downvotes + ", total: " + totalRatings);
-                    
                 }
                 rs3.close();
-                averageRatingLabel.setText(averageRating + "% of people recommend");
+                DecimalFormat df = new DecimalFormat("0.00");
+                averageRatingLabel.setText(df.format(averageRating) + "% of people recommend");
                 numberRecommendLabel.setText(upvotes + " people recommend");
                 numberNotRecommendLabel.setText(downvotes + " people do not recommend");
                 
