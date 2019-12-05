@@ -9,12 +9,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JFrame;
 
 import java.text.DecimalFormat;
+import javax.swing.DefaultListModel;
 
 
 /**
@@ -23,7 +25,7 @@ import java.text.DecimalFormat;
  */
 public class SearchPageUI extends javax.swing.JFrame {
     Connection connection;
-    
+    String playerId;
     
     /**
      * Creates new form SearchPageUI
@@ -33,11 +35,26 @@ public class SearchPageUI extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
     }
     
-    public SearchPageUI(Connection connection) {
+    public SearchPageUI(Connection connection, String playerId) {
         initComponents();
         this.setLocationRelativeTo(null);
         this.connection = connection;
+        DefaultListModel listModel = new DefaultListModel();
         
+        if (connection != null) {
+            try {
+                String sqlSelectTags = "SELECT DISTINCT genre_name FROM tag";
+                Statement stmt = connection.createStatement();
+                ResultSet rs = stmt.executeQuery(sqlSelectTags);
+                while(rs.next())
+                    listModel.addElement(rs.getString("genre_name"));
+                tagList.setModel(listModel);
+            }
+            catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        this.playerId = playerId;
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
     }
@@ -56,7 +73,7 @@ public class SearchPageUI extends javax.swing.JFrame {
         welcomeLabel = new javax.swing.JLabel();
         titleSearchBar = new javax.swing.JTextField();
         searchButton = new javax.swing.JButton();
-        esrbPicker = new javax.swing.JComboBox<String>();
+        esrbPicker = new javax.swing.JComboBox<>();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
@@ -67,7 +84,7 @@ public class SearchPageUI extends javax.swing.JFrame {
         jTextField1 = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tagList = new javax.swing.JList<String>();
+        tagList = new javax.swing.JList<>();
         errorLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -89,7 +106,7 @@ public class SearchPageUI extends javax.swing.JFrame {
             }
         });
 
-        esrbPicker.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-", "E", "E10", "T", "M" }));
+        esrbPicker.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "-", "E", "E10", "T", "M" }));
 
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel2.setText("ESRB");
@@ -119,10 +136,10 @@ public class SearchPageUI extends javax.swing.JFrame {
 
         jLabel1.setText("%");
 
-        tagList.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 5", "Multiplayer", "Free-to-Play", "Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 5", "Multiplayer", "Free-to-Play" };
+        tagList.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "FPS", "RPG", "Tag 3", "Tag 4", "Tag 5", "Multiplayer", "Free-to-Play", "Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 5", "Multiplayer", "Free-to-Play" };
             public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
+            public String getElementAt(int i) { return strings[i]; }
         });
         jScrollPane1.setViewportView(tagList);
 
@@ -195,7 +212,6 @@ public class SearchPageUI extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(2, 2, 2)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(errorLabel)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -208,6 +224,8 @@ public class SearchPageUI extends javax.swing.JFrame {
     }//GEN-LAST:event_titleSearchBarActionPerformed
 
     private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonActionPerformed
+
+
         if (!checkTextFields()) {
             return;
         }
@@ -283,7 +301,7 @@ public class SearchPageUI extends javax.swing.JFrame {
                 
                 System.out.println(stmt.toString());
                 ResultSet rs = stmt.executeQuery();                
-                SearchResultsUI results = new SearchResultsUI(connection, rs, sqlSelect, params, minRating);
+                SearchResultsUI results = new SearchResultsUI(connection, rs, sqlSelect, params, minRating, playerId);
                 this.setVisible(false);
                 results.setVisible(true);
                 rs.close();
@@ -295,6 +313,7 @@ public class SearchPageUI extends javax.swing.JFrame {
         
 
         
+
     }//GEN-LAST:event_searchButtonActionPerformed
 
     private void maxPriceTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_maxPriceTextFieldActionPerformed

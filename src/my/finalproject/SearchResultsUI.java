@@ -20,6 +20,7 @@ import javax.swing.JComboBox;
  */
 public class SearchResultsUI extends javax.swing.JFrame {
     Connection connection;
+    String playerId;
     ResultSet rsTitles;
     String sqlSelect;
     Map<String, String> params;
@@ -33,7 +34,7 @@ public class SearchResultsUI extends javax.swing.JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
     
-    public SearchResultsUI(Connection connection, ResultSet rs, String sqlSelect, Map<String, String> params, String rating) {
+    public SearchResultsUI(Connection connection, ResultSet rs, String sqlSelect, Map<String, String> params, String rating, String playerId) {
         initComponents();
         this.connection = connection;
         this.rsTitles = rs;
@@ -56,6 +57,7 @@ public class SearchResultsUI extends javax.swing.JFrame {
         }
         
         this.setLocationRelativeTo(null);
+        this.playerId = playerId;
     }
 
     /**
@@ -164,7 +166,7 @@ public class SearchResultsUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void homeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_homeButtonActionPerformed
-        SearchPageUI searchPage = new SearchPageUI(connection);
+        SearchPageUI searchPage = new SearchPageUI(connection, playerId);
         searchPage.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_homeButtonActionPerformed
@@ -253,7 +255,7 @@ public class SearchResultsUI extends javax.swing.JFrame {
                 catch (SQLException e) {
                     e.printStackTrace();
                 }
-            ProductPageUI productPage = new ProductPageUI(gameId);
+            ProductPageUI productPage = new ProductPageUI(gameId, playerId);
             productPage.setVisible(true);
             this.setVisible(false);
             }
