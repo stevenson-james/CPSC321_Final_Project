@@ -263,11 +263,7 @@ public class SearchPageUI extends javax.swing.JFrame {
         
         String minRating = jTextField1.getText();
         if (!jTextField1.getText().equals("")) {
-<<<<<<< HEAD
             sqlSelect += " HAVING AVG(r.score) * 100 > ?";
-=======
-            sqlSelect += " HAVING AVG(r.score) > ?";
->>>>>>> d662bf182616348a0173fcfa2554ba609211008f
         }
                 
         
