@@ -11,8 +11,10 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.util.Properties;
+import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 
 /**
@@ -63,6 +65,23 @@ public class ProductPageUI extends javax.swing.JFrame {
 	    connection = DriverManager.getConnection(url, usr, pwd);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        
+        DefaultListModel listModel = new DefaultListModel();
+        
+        if (connection != null) {
+            try {
+                String sqlSelectTags = "SELECT DISTINCT genre_name FROM tag WHERE game_id = ?";
+                PreparedStatement stmt = connection.prepareStatement(sqlSelectTags);
+                stmt.setString(1, gameId);
+                ResultSet rs = stmt.executeQuery();
+                while(rs.next())
+                    listModel.addElement(rs.getString("genre_name"));
+                tagList.setModel(listModel);
+            }
+            catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         
         this.gameId = gameId;
