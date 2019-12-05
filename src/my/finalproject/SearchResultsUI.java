@@ -256,7 +256,7 @@ public class SearchResultsUI extends javax.swing.JFrame {
                 catch (SQLException e) {
                     e.printStackTrace();
                 }
-            ProductPageUI productPage = new ProductPageUI(gameId, playerId);
+            ProductPageUI productPage = new ProductPageUI(gameId, playerId, connection);
             productPage.setVisible(true);
             this.setVisible(false);
             }
