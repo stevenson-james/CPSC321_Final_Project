@@ -29,6 +29,7 @@ public class ProductPageUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        ratingButttonGroup = new javax.swing.ButtonGroup();
         jLabel1 = new javax.swing.JLabel();
         averageRatingLabel = new javax.swing.JLabel();
         priceLabel = new javax.swing.JLabel();
@@ -71,6 +72,7 @@ public class ProductPageUI extends javax.swing.JFrame {
         jLabel9.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
         jLabel9.setText("Rate This Game");
 
+        ratingButttonGroup.add(recommendRadioButton);
         recommendRadioButton.setText("Recommended");
         recommendRadioButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -78,6 +80,7 @@ public class ProductPageUI extends javax.swing.JFrame {
             }
         });
 
+        ratingButttonGroup.add(notRecommendRadioButton);
         notRecommendRadioButton.setText("Not Recommended");
         notRecommendRadioButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -125,10 +128,6 @@ public class ProductPageUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(homeButton)
-                        .addGap(42, 42, 42)
-                        .addComponent(jLabel1))
-                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(recommendRadioButton)
@@ -150,7 +149,6 @@ public class ProductPageUI extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel9)
-                                    .addComponent(notRecommendRadioButton)
                                     .addComponent(averageRatingLabel)
                                     .addComponent(priceLabel)
                                     .addComponent(numberRecommendLabel)
@@ -160,7 +158,15 @@ public class ProductPageUI extends javax.swing.JFrame {
                                         .addComponent(jLabel6)))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 84, Short.MAX_VALUE)
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap())))
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(notRecommendRadioButton)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(homeButton)
+                                .addGap(42, 42, 42)
+                                .addComponent(jLabel1)))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -201,9 +207,9 @@ public class ProductPageUI extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(recommendRadioButton)
                     .addComponent(submitButton, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(notRecommendRadioButton)
-                .addGap(9, 9, 9))
+                .addContainerGap(21, Short.MAX_VALUE))
         );
 
         pack();
@@ -276,6 +282,7 @@ public class ProductPageUI extends javax.swing.JFrame {
     private javax.swing.JLabel numberNotRecommendLabel;
     private javax.swing.JLabel numberRecommendLabel;
     private javax.swing.JLabel priceLabel;
+    private javax.swing.ButtonGroup ratingButttonGroup;
     private javax.swing.JLabel recommendGameLabel1;
     private javax.swing.JLabel recommendGameLabel2;
     private javax.swing.JRadioButton recommendRadioButton;
