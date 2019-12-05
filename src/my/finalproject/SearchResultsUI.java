@@ -5,6 +5,7 @@
  */
 package my.finalproject;
 
+import javax.swing.JFrame;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,6 +25,7 @@ public class SearchResultsUI extends javax.swing.JFrame {
     public SearchResultsUI() {
         initComponents();
         this.setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
     
     public SearchResultsUI(Connection connection, ResultSet rs) {

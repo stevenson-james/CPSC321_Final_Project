@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Properties;
+import javax.swing.JFrame;
 
 /**
  *
@@ -25,6 +26,8 @@ public class LogInUI extends javax.swing.JFrame {
      * Creates new form LogInUI
      */
     public LogInUI() {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
         try {
 	    // connection info
 	    Properties prop = new Properties();
@@ -47,6 +50,8 @@ public class LogInUI extends javax.swing.JFrame {
     }
     
     public LogInUI(Connection connection) {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
         this.connection = connection;
         initComponents();
         this.setLocationRelativeTo(null);
@@ -269,4 +274,5 @@ public class LogInUI extends javax.swing.JFrame {
     private javax.swing.JPasswordField password;
     private javax.swing.JTextField username;
     // End of variables declaration//GEN-END:variables
+
 }

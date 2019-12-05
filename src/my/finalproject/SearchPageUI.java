@@ -9,7 +9,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.JFrame;
+
 import java.text.DecimalFormat;
+
 
 /**
  *
@@ -31,6 +37,8 @@ public class SearchPageUI extends javax.swing.JFrame {
         initComponents();
         this.setLocationRelativeTo(null);
         this.connection = connection;
+        
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
     }
 
@@ -59,7 +67,8 @@ public class SearchPageUI extends javax.swing.JFrame {
         jTextField1 = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
+        tagList = new javax.swing.JList<String>();
+        errorLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -80,7 +89,7 @@ public class SearchPageUI extends javax.swing.JFrame {
             }
         });
 
-        esrbPicker.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "E", "E10", "T", "M" }));
+        esrbPicker.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-", "E", "E10", "T", "M" }));
 
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel2.setText("ESRB");
@@ -91,22 +100,17 @@ public class SearchPageUI extends javax.swing.JFrame {
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel4.setText("Rating   >");
 
-
         jLabel5.setText("Price");
-
-        minPriceTextField.setText("lower price");
 
         jLabel6.setFont(new java.awt.Font("Tahoma", 0, 20)); // NOI18N
         jLabel6.setText("-");
 
-        maxPriceTextField.setText("upper price");
         maxPriceTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 maxPriceTextFieldActionPerformed(evt);
             }
         });
 
-        jTextField1.setText("0");
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextField1ActionPerformed(evt);
@@ -115,20 +119,22 @@ public class SearchPageUI extends javax.swing.JFrame {
 
         jLabel1.setText("%");
 
-        jList1.setModel(new javax.swing.AbstractListModel<String>() {
+        tagList.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 5", "Multiplayer", "Free-to-Play", "Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 5", "Multiplayer", "Free-to-Play" };
             public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
+            public Object getElementAt(int i) { return strings[i]; }
         });
-        jScrollPane1.setViewportView(jList1);
+        jScrollPane1.setViewportView(tagList);
+
+        errorLabel.setForeground(new java.awt.Color(200, 0, 0));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(27, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addContainerGap(50, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(welcomeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(titleSearchBar, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -136,30 +142,27 @@ public class SearchPageUI extends javax.swing.JFrame {
                         .addComponent(searchButton))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(minPriceTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(minPriceTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel6)
-                                .addGap(18, 18, 18)
-                                .addComponent(maxPriceTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel2)
-                                .addComponent(jLabel5)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(jLabel4)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jLabel1))
-                                .addComponent(esrbPicker, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(maxPriceTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel5)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel4)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel1))
+                            .addComponent(esrbPicker, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(39, 39, 39)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(18, 18, 18)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(57, 57, 57)
-                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addContainerGap(26, Short.MAX_VALUE))
+                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(errorLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(29, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -174,7 +177,7 @@ public class SearchPageUI extends javax.swing.JFrame {
                     .addComponent(jLabel2)
                     .addComponent(jLabel3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(esrbPicker, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(15, 15, 15)
@@ -185,11 +188,15 @@ public class SearchPageUI extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(maxPriceTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(minPriceTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                            .addComponent(minPriceTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(maxPriceTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(2, 2, 2)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(errorLabel)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -201,9 +208,85 @@ public class SearchPageUI extends javax.swing.JFrame {
     }//GEN-LAST:event_titleSearchBarActionPerformed
 
     private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonActionPerformed
-        SearchResultsUI searchResults = new SearchResultsUI(connection);
-        searchResults.setVisible(true);
-        this.setVisible(false);
+        if (!checkTextFields()) {
+            return;
+        }
+        
+        
+        String sqlSelect = "SELECT g.game_id FROM game g JOIN rating r USING "
+                + "(game_id) JOIN tag t USING (game_id)";
+        
+        Map<String, String> params = new HashMap<>();
+        if (!titleSearchBar.getText().equals("")) {
+            params.put("g.title = ?", titleSearchBar.getText());
+        }
+        
+        if (esrbPicker.getSelectedIndex() != 0) {
+            params.put("g.esrb = ?", esrbPicker.getSelectedItem().toString());
+        }
+        
+        int tagCt = 0;
+        for (String tagString : tagList.getSelectedValuesList()) {
+            params.put("t.tag = ?", tagString);
+            tagCt++;
+        }
+        
+        if (!minPriceTextField.getText().equals("")) {
+            params.put("g.price >= ?", minPriceTextField.getText());
+        }
+        
+        if (!maxPriceTextField.getText().equals("")) {
+            params.put("g.price <= ?", maxPriceTextField.getText());
+        }
+        
+        int pCt = 0;
+        for (String paramKey : params.keySet()) {
+            if (pCt == 0) {
+                sqlSelect += " WHERE " + paramKey;
+                pCt++;
+            } else {
+                sqlSelect += " AND " + paramKey;
+                pCt++;
+            }
+        }
+        
+        sqlSelect += " GROUP BY game_id";
+        
+        String minRating = jTextField1.getText();
+        if (!jTextField1.getText().equals("")) {
+            sqlSelect += " HAVING AVG(r.rating) > ?";
+        }
+        
+        System.out.println(sqlSelect);
+        
+        
+        if (connection != null) {
+            try {
+                PreparedStatement stmt = connection.prepareStatement(sqlSelect);
+                
+                int setCt = 1;
+                for (String paramKey : params.keySet()) {
+                    stmt.setString(setCt, params.get(paramKey));
+                    setCt++;
+                }
+                if (!minRating.equals("")) {
+                    stmt.setString(setCt, minRating);
+                }
+                
+                System.out.println(stmt.toString());
+//                ResultSet rs = stmt.executeQuery();
+//                
+//                SearchResultsUI results = new SearchResultsUI(connection, rs);
+//                this.setVisible(false);
+//                results.setVisible(true);
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        
+
+        
     }//GEN-LAST:event_searchButtonActionPerformed
 
     private void maxPriceTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_maxPriceTextFieldActionPerformed
@@ -250,6 +333,7 @@ public class SearchPageUI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel errorLabel;
     private javax.swing.JComboBox<String> esrbPicker;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -257,13 +341,46 @@ public class SearchPageUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JList<String> jList1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField maxPriceTextField;
     private javax.swing.JTextField minPriceTextField;
     private javax.swing.JButton searchButton;
+    private javax.swing.JList<String> tagList;
     private javax.swing.JTextField titleSearchBar;
     private javax.swing.JLabel welcomeLabel;
     // End of variables declaration//GEN-END:variables
+
+    private boolean checkTextFields() {
+        String rating = jTextField1.getText();
+        String minPrice = minPriceTextField.getText();
+        String maxPrice = maxPriceTextField.getText();
+        
+        try {
+            if (!rating.equals("")) {
+                if (Double.parseDouble(rating) > 100) {
+                    errorLabel.setText("Ratings must be between 0 and 100");
+                    return false;
+                }
+            }
+            
+            if (!minPrice.equals("")) {
+                Double.parseDouble(minPrice);
+            }
+            if (!maxPrice.equals("")) {
+                Double.parseDouble(maxPrice);
+            }
+            
+
+            if (!minPrice.equals("") && !maxPrice.equals("")) {
+                return Double.parseDouble(minPrice) < Double.parseDouble(maxPrice);
+            }
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            errorLabel.setText("Enter numeric values for rating and price range");
+            return false;
+        }
+    }
 }
