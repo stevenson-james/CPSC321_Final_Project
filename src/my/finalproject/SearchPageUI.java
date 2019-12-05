@@ -213,7 +213,7 @@ public class SearchPageUI extends javax.swing.JFrame {
         }
         
         
-        String sqlSelect = "SELECT g.game_id FROM game g JOIN rating r USING "
+        String sqlSelect = "SELECT g.title FROM game g JOIN rating r USING "
                 + "(game_id) JOIN tag t USING (game_id)";
         
         Map<String, String> params = new HashMap<>();
@@ -227,7 +227,7 @@ public class SearchPageUI extends javax.swing.JFrame {
         
         int tagCt = 0;
         for (String tagString : tagList.getSelectedValuesList()) {
-            params.put("t.tag = ?", tagString);
+            params.put("t.genre_name = ?", tagString);
             tagCt++;
         }
         
@@ -254,14 +254,13 @@ public class SearchPageUI extends javax.swing.JFrame {
         
         String minRating = jTextField1.getText();
         if (!jTextField1.getText().equals("")) {
-            sqlSelect += " HAVING AVG(r.rating) > ?";
+            sqlSelect += " HAVING AVG(r.score) * 100 > ?";
         }
-        
-        System.out.println(sqlSelect);
-        
+                
         
         if (connection != null) {
             try {
+                System.out.println("Search Page Connection");
                 PreparedStatement stmt = connection.prepareStatement(sqlSelect);
                 
                 int setCt = 1;
@@ -274,11 +273,11 @@ public class SearchPageUI extends javax.swing.JFrame {
                 }
                 
                 System.out.println(stmt.toString());
-//                ResultSet rs = stmt.executeQuery();
-//                
-//                SearchResultsUI results = new SearchResultsUI(connection, rs);
-//                this.setVisible(false);
-//                results.setVisible(true);
+                ResultSet rs = stmt.executeQuery();                
+                SearchResultsUI results = new SearchResultsUI(connection, rs);
+                this.setVisible(false);
+                results.setVisible(true);
+                rs.close();
 
             } catch (SQLException e) {
                 e.printStackTrace();

@@ -40,6 +40,7 @@
                               <Component id="error" alignment="0" max="32767" attributes="0"/>
                               <Component id="sortByComboBox" min="-2" pref="95" max="-2" attributes="0"/>
                           </Group>
+                          <Component id="gameCountLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                   <Group type="102" attributes="0">
@@ -66,7 +67,9 @@
                       <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="sortByComboBox" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="54" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="gameCountLabel" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="42" max="-2" attributes="0"/>
                       <Component id="error" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="32767" attributes="0"/>
                       <Component id="goToGameButton" min="-2" pref="31" max="-2" attributes="0"/>
@@ -158,6 +161,8 @@
           <Color blue="0" green="0" red="c8" type="rgb"/>
         </Property>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="gameCountLabel">
     </Component>
   </SubComponents>
 </Form>
