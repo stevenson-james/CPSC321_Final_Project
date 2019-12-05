@@ -213,8 +213,8 @@ public class SearchPageUI extends javax.swing.JFrame {
         }
         
         
-        String sqlSelect = "SELECT g.title FROM game g JOIN rating r USING "
-                + "(game_id) JOIN tag t USING (game_id)";
+        String sqlSelect = "SELECT g.title FROM game g LEFT JOIN rating r USING "
+                + "(game_id) LEFT JOIN tag t USING (game_id)";
         
         Map<String, String> params = new HashMap<>();
         if (!titleSearchBar.getText().equals("")) {
@@ -227,7 +227,7 @@ public class SearchPageUI extends javax.swing.JFrame {
 
         int tagCt = 0;
         for (String tagString : tagList.getSelectedValuesList()) {
-            params.put("t.genre_name = ?", tagString);
+            params.put("tag" + tagCt, tagString);
             tagCt++;
         }
         
@@ -283,7 +283,7 @@ public class SearchPageUI extends javax.swing.JFrame {
                 
                 System.out.println(stmt.toString());
                 ResultSet rs = stmt.executeQuery();                
-                SearchResultsUI results = new SearchResultsUI(connection, rs);
+                SearchResultsUI results = new SearchResultsUI(connection, rs, sqlSelect, params, minRating);
                 this.setVisible(false);
                 results.setVisible(true);
                 rs.close();

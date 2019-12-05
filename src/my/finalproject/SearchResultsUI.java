@@ -10,7 +10,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
 import javax.swing.DefaultListModel;
+import javax.swing.JComboBox;
 
 /**
  *
@@ -19,6 +21,9 @@ import javax.swing.DefaultListModel;
 public class SearchResultsUI extends javax.swing.JFrame {
     Connection connection;
     ResultSet rsTitles;
+    String sqlSelect;
+    Map<String, String> params;
+    String rating;
     /**
      * Creates new form SearchResultsUI
      */
@@ -28,10 +33,13 @@ public class SearchResultsUI extends javax.swing.JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
     
-    public SearchResultsUI(Connection connection, ResultSet rs) {
+    public SearchResultsUI(Connection connection, ResultSet rs, String sqlSelect, Map<String, String> params, String rating) {
         initComponents();
         this.connection = connection;
         this.rsTitles = rs;
+        this.sqlSelect = sqlSelect;
+        this.params = params;
+        this.rating = rating;
         int resultNumber = 0;
         DefaultListModel listModel = new DefaultListModel();
         
@@ -162,7 +170,65 @@ public class SearchResultsUI extends javax.swing.JFrame {
     }//GEN-LAST:event_homeButtonActionPerformed
 
     private void sortByComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sortByComboBoxActionPerformed
-        // TODO add your handling code here:
+        JComboBox<String> order = (JComboBox<String>) evt.getSource();
+        String orderAddition = "";
+        switch (order.getSelectedIndex()) {
+            case 0:
+                orderAddition += " ORDER BY g.title ASC";
+                break;
+            case 1:
+                orderAddition += " ORDER BY g.title DESC";
+                break;
+            case 2:
+                orderAddition += " ORDER BY g.release_date ASC";
+                break;
+            case 3:
+                orderAddition += " ORDER BY g.release_date DESC";
+                break;
+            case 4:
+                orderAddition += " ORDER BY AVG(r.score) ASC";
+                break;
+            case 5:
+                orderAddition += " ORDER BY AVG(r.score) DESC";
+                break;
+            case 6: 
+                orderAddition += " ORDER BY g.price ASC";
+                break;
+            case 7:
+                orderAddition += " ORDER BY g.price DESC";
+                break;
+        }
+        
+        if (connection != null) {
+            try {
+                PreparedStatement stmt = connection.prepareStatement(sqlSelect + orderAddition);
+                
+                int setCt = 1;
+                for (String paramKey : params.keySet()) {
+                    stmt.setString(setCt, params.get(paramKey));
+                    setCt++;
+                }
+                if (!rating.equals("")) {
+                    stmt.setString(setCt, rating);
+                }
+                
+                System.out.println(stmt.toString());
+                ResultSet rs = stmt.executeQuery();  
+                
+                DefaultListModel listModel = new DefaultListModel();
+                int resultNumber = 0;
+                while(rs.next()) {
+                    listModel.addElement(rs.getString("g.title"));
+                    resultNumber++;
+                }
+                gameCountLabel.setText(Integer.toString(resultNumber) + " games found");
+                resultsList.setModel(listModel);
+                rs.close();
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }//GEN-LAST:event_sortByComboBoxActionPerformed
 
     private void goToGameButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_goToGameButtonActionPerformed
