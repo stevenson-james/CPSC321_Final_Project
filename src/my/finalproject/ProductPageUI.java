@@ -21,6 +21,7 @@ import javax.swing.JFrame;
  */
 public class ProductPageUI extends javax.swing.JFrame {
     String gameId;
+    String playerId;
     Connection connection;
     boolean rating;
 
@@ -41,9 +42,10 @@ public class ProductPageUI extends javax.swing.JFrame {
         loadInfo();
     }
 
-    public ProductPageUI(String gameId) {
+    public ProductPageUI(String gameId, String playerId) {
         initComponents();
         this.setLocationRelativeTo(null);
+        this.playerId = playerId;
         
         try {
 	    // connection info
@@ -103,6 +105,7 @@ public class ProductPageUI extends javax.swing.JFrame {
         jLabel12 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tagList = new javax.swing.JList<>();
+        jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -173,6 +176,8 @@ public class ProductPageUI extends javax.swing.JFrame {
         tagList.setSelectionForeground(new java.awt.Color(0, 0, 0));
         jScrollPane1.setViewportView(tagList);
 
+        jLabel2.setText("");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -210,7 +215,7 @@ public class ProductPageUI extends javax.swing.JFrame {
                                         .addComponent(numberNotRecommendLabel)
                                         .addGap(0, 0, 0)
                                         .addComponent(jLabel6)))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 84, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
@@ -221,6 +226,10 @@ public class ProductPageUI extends javax.swing.JFrame {
                                 .addGap(42, 42, 42)
                                 .addComponent(jLabel1)))
                         .addGap(0, 0, Short.MAX_VALUE))))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(59, 59, 59)
+                .addComponent(jLabel2)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -243,7 +252,7 @@ public class ProductPageUI extends javax.swing.JFrame {
                             .addComponent(jLabel6)))
                     .addGroup(layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 106, Short.MAX_VALUE)))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel12)
@@ -263,7 +272,8 @@ public class ProductPageUI extends javax.swing.JFrame {
                     .addComponent(submitButton, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(notRecommendRadioButton)
-                .addContainerGap(21, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel2))
         );
 
         pack();
@@ -276,6 +286,45 @@ public class ProductPageUI extends javax.swing.JFrame {
 
     private void submitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_submitButtonActionPerformed
         // TODO add your handling code here:
+        boolean recommendIsChecked = false;
+        boolean notRecommendIsChecked = false;
+        if(recommendRadioButton.isSelected()) {
+            recommendIsChecked = true;
+        }
+        if (notRecommendRadioButton.isSelected()) {
+            notRecommendIsChecked = true;
+        }
+        else {
+            jLabel2.setText("No button was selected");
+        }
+        try
+        {
+            if (recommendIsChecked) {
+                //Statement stmt = connection.createStatement();
+                //String q = "SELECT * FROM rating ";
+                //ResultSet rs = stmt.executeQuery(q);
+                
+                String query = "INSERT INTO rating(player_id, game_id, score) VALUES (?,?,?)";
+                PreparedStatement stmt = connection.prepareStatement(query);
+                stmt.setString(1, this.playerId);   // NEEDS TO PASS PLAYER_ID *********************************
+                stmt.setString(2, this.gameId);
+                stmt.setInt(3, 1);
+                stmt.execute();
+                jLabel2.setText("Query was executed successfully.");
+            }
+            if (notRecommendIsChecked) {
+                String query = "INSERT INTO rating(player_id, game_id, score) VALUES (?,?,?)";
+                PreparedStatement stmt = connection.prepareStatement(query);
+                stmt.setString(1, this.playerId);   // NEEDS TO PASS PLAYER_ID *********************************
+                stmt.setString(2, this.gameId);
+                stmt.setInt(3, 0);
+                stmt.execute();
+                jLabel2.setText("Query was executed successfully.");
+            }
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
     }//GEN-LAST:event_submitButtonActionPerformed
 
     private void notRecommendRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_notRecommendRadioButtonActionPerformed
@@ -283,7 +332,7 @@ public class ProductPageUI extends javax.swing.JFrame {
     }//GEN-LAST:event_notRecommendRadioButtonActionPerformed
 
     private void homeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_homeButtonActionPerformed
-        SearchPageUI searchPage = new SearchPageUI(connection);
+        SearchPageUI searchPage = new SearchPageUI(connection, playerId);
         searchPage.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_homeButtonActionPerformed
@@ -329,6 +378,7 @@ public class ProductPageUI extends javax.swing.JFrame {
     private javax.swing.JButton homeButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;

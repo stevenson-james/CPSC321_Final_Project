@@ -25,7 +25,7 @@ import javax.swing.DefaultListModel;
  */
 public class SearchPageUI extends javax.swing.JFrame {
     Connection connection;
-    
+    String playerId;
     
     /**
      * Creates new form SearchPageUI
@@ -35,7 +35,7 @@ public class SearchPageUI extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
     }
     
-    public SearchPageUI(Connection connection) {
+    public SearchPageUI(Connection connection, String playerId) {
         initComponents();
         this.setLocationRelativeTo(null);
         this.connection = connection;
@@ -54,6 +54,7 @@ public class SearchPageUI extends javax.swing.JFrame {
                 e.printStackTrace();
             }
         }
+        this.playerId = playerId;
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
     }
@@ -223,6 +224,8 @@ public class SearchPageUI extends javax.swing.JFrame {
     }//GEN-LAST:event_titleSearchBarActionPerformed
 
     private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonActionPerformed
+
+
         if (!checkTextFields()) {
             return;
         }
@@ -298,7 +301,7 @@ public class SearchPageUI extends javax.swing.JFrame {
                 
                 System.out.println(stmt.toString());
                 ResultSet rs = stmt.executeQuery();                
-                SearchResultsUI results = new SearchResultsUI(connection, rs);
+                SearchResultsUI results = new SearchResultsUI(connection, rs, playerId);
                 this.setVisible(false);
                 results.setVisible(true);
                 rs.close();
@@ -310,6 +313,7 @@ public class SearchPageUI extends javax.swing.JFrame {
         
 
         
+
     }//GEN-LAST:event_searchButtonActionPerformed
 
     private void maxPriceTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_maxPriceTextFieldActionPerformed

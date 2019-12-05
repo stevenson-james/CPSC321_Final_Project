@@ -18,6 +18,7 @@ import javax.swing.DefaultListModel;
  */
 public class SearchResultsUI extends javax.swing.JFrame {
     Connection connection;
+    String playerId;
     ResultSet rsTitles;
     /**
      * Creates new form SearchResultsUI
@@ -28,7 +29,11 @@ public class SearchResultsUI extends javax.swing.JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
     
-    public SearchResultsUI(Connection connection, ResultSet rs) {
+
+    public SearchResultsUI(Connection connection, ResultSet rs, String playerId) {
+
+    //public SearchResultsUI(Connection connection, ResultSet rs) {
+
         initComponents();
         this.connection = connection;
         this.rsTitles = rs;
@@ -48,6 +53,7 @@ public class SearchResultsUI extends javax.swing.JFrame {
         }
         
         this.setLocationRelativeTo(null);
+        this.playerId = playerId;
     }
 
     /**
@@ -156,7 +162,7 @@ public class SearchResultsUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void homeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_homeButtonActionPerformed
-        SearchPageUI searchPage = new SearchPageUI(connection);
+        SearchPageUI searchPage = new SearchPageUI(connection, playerId);
         searchPage.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_homeButtonActionPerformed
@@ -187,7 +193,7 @@ public class SearchResultsUI extends javax.swing.JFrame {
                 catch (SQLException e) {
                     e.printStackTrace();
                 }
-            ProductPageUI productPage = new ProductPageUI(gameId);
+            ProductPageUI productPage = new ProductPageUI(gameId, playerId);
             productPage.setVisible(true);
             this.setVisible(false);
             }

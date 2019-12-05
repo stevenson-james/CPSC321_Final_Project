@@ -22,6 +22,7 @@ import javax.swing.JFrame;
 public class LogInUI extends javax.swing.JFrame {
     
     Connection connection;
+    String playerId;
     /**
      * Creates new form LogInUI
      */
@@ -219,9 +220,21 @@ public class LogInUI extends javax.swing.JFrame {
         }
 
         if (passwordInput.equals(passwordDB)) {
-            SearchPageUI searchPage = new SearchPageUI(connection);
-            searchPage.setVisible(true);
-            this.setVisible(false);
+            try {
+                String q = "SELECT player_id FROM player WHERE username = ?";
+                PreparedStatement stmt = connection.prepareStatement(q);
+                stmt.setString(1, username.getText());
+                ResultSet rs = stmt.executeQuery();
+                if(rs.next()) {
+                    playerId = rs.getString("player_id");
+                } 
+                SearchPageUI searchPage = new SearchPageUI(connection, playerId);
+                searchPage.setVisible(true);
+                this.setVisible(false);
+            }   
+            catch(Exception e) {
+                e.printStackTrace();
+            }
         } else {
             inputStatusLabel.setText("Invalid username and password");
         }
