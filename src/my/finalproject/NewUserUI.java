@@ -5,6 +5,10 @@
  */
 package my.finalproject;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Arrays;
 
 /**
@@ -12,7 +16,9 @@ import java.util.Arrays;
  * @author jpats
  */
 public class NewUserUI extends javax.swing.JFrame {
-
+    Connection connection;
+    
+    
     /**
      * Creates new form NewUserUI
      */
@@ -20,6 +26,11 @@ public class NewUserUI extends javax.swing.JFrame {
         initComponents();
     }
 
+    public NewUserUI(Connection connection) {
+        this.connection = connection;
+        
+        initComponents();
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -155,45 +166,44 @@ public class NewUserUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void createButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createButtonActionPerformed
-        // Check if username exists
-        // SELECT * FROM user_pass WHERE user=?
         if (password1.getPassword().length < 4) {
             jLabel1.setText("Password must be at least 4 characters long");
             return;
         }
         
-        if (Arrays.equals(password1.getPassword(), password2.getPassword())) {
-            LogInUI logIn = new LogInUI();
-            logIn.setVisible(true);
-            this.setVisible(false);
-        } else {
+        if (!Arrays.equals(password1.getPassword(), password2.getPassword())) {
             jLabel1.setText("Passwords do not match");
+            return;
         }
         
-//        if (connection != null) {
-//            String sqlSelectUsername = "SELECT * FROM user_pass WHERE user=?";
-//            PreparedStatement stmt = connection.prepareStatement(sqlSelectUsername);
-//            stmt.setString(1, username.getText());
-//            ResultSet rs = stmt.executeQuery();
-//            if (rs.next()) {
-//                jLabel1.setText("Username is already taken, choose a different one");
-//            } else {
-//                String userDB = username.getText();
-//                String passDB = new String(password1.getPassword());
-//                String sqlInsert = "INSERT INTO user_pass(?, ?)";
-//                PreparedStatement stmt = connection.prepareStatement(sqlInsert);
-//                stmt.setString(1, userDB);
-//                stmt.setString(2, passDB);
-//                stmt.execute();
-//                LogInUI logIn = new LogInUI();
-//                logIn.setVisible(true);
-//                this.setVisible(false);
-//            }
-//        }
+        if (connection != null) {
+            try {
+                String sqlSelectUsername = "SELECT * FROM player WHERE username=?";
+                PreparedStatement stmt = connection.prepareStatement(sqlSelectUsername);
+                stmt.setString(1, username.getText());
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    jLabel1.setText("Username is already taken, choose a different one");
+                } else {
+                    String userDB = username.getText();
+                    String passDB = new String(password1.getPassword());
+                    String sqlInsert = "INSERT INTO player (username, player_pass) VALUES (?, ?)";
+                    PreparedStatement stmt1 = connection.prepareStatement(sqlInsert);
+                    stmt1.setString(1, userDB);
+                    stmt1.setString(2, passDB);
+                    stmt1.execute();
+                    LogInUI logIn = new LogInUI(connection);
+                    logIn.setVisible(true);
+                    this.setVisible(false);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }//GEN-LAST:event_createButtonActionPerformed
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
-        LogInUI logIn = new LogInUI();
+        LogInUI logIn = new LogInUI(connection);
         logIn.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_cancelButtonActionPerformed
