@@ -224,7 +224,7 @@ public class SearchPageUI extends javax.swing.JFrame {
         if (esrbPicker.getSelectedIndex() != 0) {
             params.put("g.esrb = ?", esrbPicker.getSelectedItem().toString());
         }
-        
+
         int tagCt = 0;
         for (String tagString : tagList.getSelectedValuesList()) {
             params.put("t.genre_name = ?", tagString);
@@ -242,10 +242,19 @@ public class SearchPageUI extends javax.swing.JFrame {
         int pCt = 0;
         for (String paramKey : params.keySet()) {
             if (pCt == 0) {
-                sqlSelect += " WHERE " + paramKey;
+                if (paramKey.contains("tag")) {
+                    sqlSelect += " WHERE t.genre_name = ?";
+                } else {
+                    sqlSelect += " WHERE " + paramKey;
+                }
                 pCt++;
             } else {
-                sqlSelect += " AND " + paramKey;
+                System.out.println(paramKey + ", t.genre_name");
+                if (paramKey.contains("tag")) {
+                    sqlSelect += " OR t.genre_name = ?";
+                } else {
+                    sqlSelect += " AND " + paramKey;
+                }
                 pCt++;
             }
         }
@@ -254,7 +263,11 @@ public class SearchPageUI extends javax.swing.JFrame {
         
         String minRating = jTextField1.getText();
         if (!jTextField1.getText().equals("")) {
+<<<<<<< HEAD
             sqlSelect += " HAVING AVG(r.score) * 100 > ?";
+=======
+            sqlSelect += " HAVING AVG(r.score) > ?";
+>>>>>>> d662bf182616348a0173fcfa2554ba609211008f
         }
                 
         
