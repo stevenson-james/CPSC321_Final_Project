@@ -42,16 +42,12 @@ public class LogInUI extends javax.swing.JFrame {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
-        
         initComponents();
+        this.setLocationRelativeTo(null);
     }
     
     public LogInUI(Connection connection) {
         this.connection = connection;
-        
-        
-        
         initComponents();
         this.setLocationRelativeTo(null);
     }
