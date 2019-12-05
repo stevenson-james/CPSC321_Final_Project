@@ -19,6 +19,7 @@ public class LogInUI extends javax.swing.JFrame {
      */
     public LogInUI() {
         initComponents();
+        this.setLocationRelativeTo(null);
     }
 
     /**
