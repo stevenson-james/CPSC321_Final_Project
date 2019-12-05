@@ -56,7 +56,7 @@ public class SearchPageUI extends javax.swing.JFrame {
         welcomeLabel = new javax.swing.JLabel();
         titleSearchBar = new javax.swing.JTextField();
         searchButton = new javax.swing.JButton();
-        esrbPicker = new javax.swing.JComboBox<String>();
+        esrbPicker = new javax.swing.JComboBox<>();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
@@ -67,7 +67,7 @@ public class SearchPageUI extends javax.swing.JFrame {
         jTextField1 = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tagList = new javax.swing.JList<String>();
+        tagList = new javax.swing.JList<>();
         errorLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -89,7 +89,7 @@ public class SearchPageUI extends javax.swing.JFrame {
             }
         });
 
-        esrbPicker.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-", "E", "E10", "T", "M" }));
+        esrbPicker.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "-", "E", "E10", "T", "M" }));
 
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel2.setText("ESRB");
@@ -119,10 +119,10 @@ public class SearchPageUI extends javax.swing.JFrame {
 
         jLabel1.setText("%");
 
-        tagList.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 5", "Multiplayer", "Free-to-Play", "Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 5", "Multiplayer", "Free-to-Play" };
+        tagList.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "FPS", "RPG", "Tag 3", "Tag 4", "Tag 5", "Multiplayer", "Free-to-Play", "Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 5", "Multiplayer", "Free-to-Play" };
             public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
+            public String getElementAt(int i) { return strings[i]; }
         });
         jScrollPane1.setViewportView(tagList);
 
@@ -195,7 +195,6 @@ public class SearchPageUI extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(2, 2, 2)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(errorLabel)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -227,7 +226,7 @@ public class SearchPageUI extends javax.swing.JFrame {
 
         int tagCt = 0;
         for (String tagString : tagList.getSelectedValuesList()) {
-            params.put("t.genre_name = ?", tagString);
+            params.put("tag" + tagCt, tagString);
             tagCt++;
         }
         
